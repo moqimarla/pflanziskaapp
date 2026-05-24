@@ -17,13 +17,15 @@ export default function Navigationsleiste() {
         Pflanzen
       </Link>
 
+      <Link style={styles.item(location.pathname === "/tagebuch")} to="/tagebuch">
+        Tagebuch
+      </Link>
+      
       <Link style={styles.item(location.pathname === "/einstellungen")} to="/einstellungen">
         Einstellungen
       </Link>
 
-      <Link style={styles.item(location.pathname === "/tagebuch")} to="/tagebuch">
-        Tagebuch
-      </Link>
+
     </div>
   );
 }
