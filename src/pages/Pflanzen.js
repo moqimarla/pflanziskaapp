@@ -26,6 +26,10 @@ export default function Pflanzen () {
     datum: "",
  });
 
+ const [editId, setEditId] = useState(null);
+
+ const [fehler, setFehler] = useState("");
+
 
  function handleChange(e) {
     setForm({
@@ -34,9 +38,8 @@ export default function Pflanzen () {
     });
  }
 
- function PflanzeHinzufuegen() {
+ /*function PflanzeHinzufuegen() {
     if (!form.name || !form.typ) return;
-
 
     setPflanzen([
         ...pflanzen,
@@ -51,7 +54,53 @@ export default function Pflanzen () {
         datum: "",
     });
     setOpen(false);
- }
+ }*/
+
+ function PflanzeSpeichern() {
+    if (!form.name || !form.typ) return;
+    const nameExistiert = pflanzen.some(
+        p =>
+        p.name.toLowerCase() === form.name.toLowerCase() &&
+        p.id !== editId
+    );
+
+    if (nameExistiert) {
+        setFehler("Eine Pflanze mit diesem Namen existiert bereits.");
+        return;
+    }
+
+    if (editId) {
+        setPflanzen(
+            pflanzen.map(p =>
+            p.id === editId ? { ...p, ...form } : p
+            )
+        );
+        setEditId(null);
+    } else {
+        setPflanzen([
+        ...pflanzen,
+        { id: Date.now(), ...form }
+        ]);
+    }
+
+    setForm({ name: "", typ: "", datum: "" });
+    setOpen(false);
+}  
+
+ function startEdit(pflanze) {
+  setForm({
+    name: pflanze.name,
+    typ: pflanze.typ,
+    datum: pflanze.datum,
+  });
+
+  setEditId(pflanze.id);
+  setOpen(true);
+}
+
+ function pflanzeLoeschen(id) {
+  setPflanzen(pflanzen.filter(p => p.id !== id));
+}
 
 
  //ab hier nur noch styling, keine Funktion perse und: JSX, also Kommentare anders schreiben
@@ -76,6 +125,35 @@ export default function Pflanzen () {
                     <h2>{pflanze.name}</h2>
                     <p>Typ: {pflanze.typ}</p>
                     <p>Datum: {pflanze.datum}</p>
+                    <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+    
+                        <button
+                            onClick={() => startEdit(pflanze)}
+                            style={{
+                                padding: "8px 12px",
+                                borderRadius: 8,
+                                border: "none",
+                                backgroundColor: "#FFD966",
+                                cursor: "pointer",
+                            }}
+                        >
+                            Bearbeiten
+                        </button>
+
+                        <button
+                            onClick={() => pflanzeLoeschen(pflanze.id)}
+                            style={{
+                                padding: "8px 12px",
+                                borderRadius: 8,
+                                border: "none",
+                                backgroundColor: "#FF8A8A",
+                                cursor: "pointer",
+                            }}
+                        >
+                            Löschen
+                        </button>
+
+                    </div>
                 </div>
             ))}
 
@@ -162,7 +240,7 @@ export default function Pflanzen () {
                          outline: "none",}}
                     />
                     <button onClick={() => setOpen(false)}>Abbrechen</button>
-                    <button onClick={PflanzeHinzufuegen} style={{marginRight: 10}}>Hinzufügen</button>
+                    <button onClick={PflanzeSpeichern} style={{marginRight: 10}}>Hinzufügen</button>
                 </div>
             </div>
         )}
