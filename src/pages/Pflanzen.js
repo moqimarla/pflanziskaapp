@@ -9,27 +9,42 @@ export default function Pflanzen () {
  });
 
  useEffect(() => {
+    console.log("SAVE", pflanzen);
   localStorage.setItem("pflanzen", JSON.stringify(pflanzen));
 }, [pflanzen]);
 
-
 //------------
 
-
  const [open, setOpen] = useState(false);
-
 
  //wie eine Pflanzendatei aussehen sollte
  const [form, setForm] = useState({
     name: "",
     typ: "",
     datum: "",
+    wasser: "", 
+    licht: "",
  });
 
  const [editId, setEditId] = useState(null);
 
  const [fehler, setFehler] = useState("");
 
+ const [suchbegriff, setSuchbegriff] = useState("");
+ const [vorschlaege, setVorschlaege] = useState([]);
+
+ useEffect(() => {
+    if (suchbegriff.trim().length === 0) {
+        setVorschlaege([]);
+        return
+    }
+
+    const timeout = setTimeout(() => {
+        suchePflanzen(suchbegriff);
+    }, 500);
+    
+    return () => clearTimeout(timeout);
+ }, [suchbegriff]);
 
  function handleChange(e) {
     setForm({
@@ -55,6 +70,55 @@ export default function Pflanzen () {
     });
     setOpen(false);
  }*/
+
+    //das ist dfie API verknüpfung. Wird auf maximal 4 Eintraege reduziert, die angezeigt werden,
+    //suche nur alle 500ms, damit wir nicht szu viele Anfragen haben
+async function suchePflanzen(text){
+
+    if(text.trim().length === 0){
+        setVorschlaege([]);
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `https://perenual.com/api/v2/species-list?key=${process.env.REACT_APP_PERENUAL_KEY}&q=${text}`
+        );
+
+        const data = await response.json();
+
+        setVorschlaege((data.data || []).slice(0, 4));
+
+    } catch (error) {
+        console.error("Fehler bei der Pflanzensuche:", error);
+    }
+}
+
+//hier wird das alles von Perenual gefetcht
+async function pflanzeAuswaehlen(pflanze) {
+    try {
+       const response = await fetch(
+    `https://perenual.com/api/v2/species/details/${pflanze.id}?key=${process.env.REACT_APP_PERENUAL_KEY}`
+);
+
+        const data = await response.json();
+
+        setForm({
+            name: pflanze.scientific_name?.[0] || "",
+            typ: pflanze.common_name || "",
+            datum: "",
+            wasser: data.watering || "",
+            licht: data.sunlight?.join(", ") || "",
+            bild: data.default_image?.regular_url || ""
+        });
+
+        setVorschlaege([]);
+        setSuchbegriff(pflanze.common_name || "");
+
+    } catch (error) {
+        console.error("Fehler beim Abrufen der Pflanzendetails:", error);
+    }
+}
 
  function PflanzeSpeichern() {
     if (!form.name || !form.typ) return;
@@ -98,10 +162,11 @@ export default function Pflanzen () {
   setOpen(true);
 }
 
+console.log(process.env.REACT_APP_PERENUAL_KEY);
+
  function pflanzeLoeschen(id) {
   setPflanzen(pflanzen.filter(p => p.id !== id));
 }
-
 
  //ab hier nur noch styling, keine Funktion perse und: JSX, also Kommentare anders schreiben
 
@@ -119,15 +184,16 @@ export default function Pflanzen () {
                     boxShadow: "0px 2px8px rgba(0,0,0,0.05)",
                     border: "1px solid #E8E8E8",
                     display: "flex",
-                    flexDirection: "column",
-                    gap: 4,
+                    flexDirection: "space-between",
+                    gap: 12,
                   }}>
+                    <div style={{flex: 1}}>
                     <h2>{pflanze.name}</h2>
                     <p>Typ: {pflanze.typ}</p>
                     <p>Datum: {pflanze.datum}</p>
-                    <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-    
-                        <button
+                    <p>Wasser: {pflanze.wasser}</p>
+                    <p>Licht: {pflanze.licht}</p>
+                      <button
                             onClick={() => startEdit(pflanze)}
                             style={{
                                 padding: "8px 12px",
@@ -139,8 +205,7 @@ export default function Pflanzen () {
                         >
                             Bearbeiten
                         </button>
-
-                        <button
+                         <button
                             onClick={() => pflanzeLoeschen(pflanze.id)}
                             style={{
                                 padding: "8px 12px",
@@ -152,6 +217,24 @@ export default function Pflanzen () {
                         >
                             Löschen
                         </button>
+                        </div>
+                    
+                    
+
+
+
+                    {pflanze.bild && (
+                    <img 
+                         src={pflanze.bild}
+                         alt={pflanze.name}
+                          style={{ width: "20%", height: "20%", objectFit: "cover", borderRadius: 10, marginTop: 10 }}
+                        />
+)}
+                    <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+    
+                     
+
+                   
 
                     </div>
                 </div>
@@ -195,6 +278,40 @@ export default function Pflanzen () {
                 }}>
                     {/* die Inputs sind eigentlich alle nach dem gleichen Prinzip aufgebaut */}
                     <h2>Neue Pflanze</h2>
+
+                    <input
+                    placeholder="Pflanze suchen"
+                    value={suchbegriff}
+                    onChange={(e) => setSuchbegriff(e.target.value)}
+                    style={{
+                        width: "100%",        
+                        padding: "10px 12px", 
+                        marginBottom: 10, 
+                        borderRadius:10, 
+                        border: "1px solid #E8E8E8",
+                        boxSizing: "border-box",
+                         outline: "none",}}
+                    />
+
+                    {vorschlaege.map((pflanze) => (
+                        <div 
+                            key={pflanze.id}
+                            onClick={() => pflanzeAuswaehlen(pflanze)}
+                            style={{
+                                backgroundColor: "white",
+                                padding: 10,
+                                marginBottom: 5,
+                                borderRadius: 8,
+                                cursor: "pointer",
+                                border: "1px solid #E8E8E8",
+                            }}
+                            >
+                                <strong> {pflanze.common_name}</strong>
+                                <br/>
+                                <small>{pflanze.scientific_name?.[0]}</small>
+                        </div>
+                    ))}
+
                     <input
                     name="name"
                     placeholder="Name"
@@ -205,12 +322,12 @@ export default function Pflanzen () {
                     style={{width: "100%",        
                         padding: "10px 12px", 
                         marginBottom: 10, 
-                        borderRadius:10, 
+                        borderRadius: 10, 
                         border: "1px solid #E8E8E8",
                         boxSizing: "border-box",
                          outline: "none",
         }}
-                    />
+    />                
                     <input
                     name="typ"
                     placeholder="Typ"
