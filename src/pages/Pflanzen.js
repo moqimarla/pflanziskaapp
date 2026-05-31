@@ -165,6 +165,8 @@ async function pflanzeAuswaehlen(pflanze) {
 console.log(process.env.REACT_APP_PERENUAL_KEY);
 
  function pflanzeLoeschen(id) {
+    const bestaetigt = window.confirm("Möchtest du diese Pflanze wirklich löschen?");
+     if (!bestaetigt) return;
   setPflanzen(pflanzen.filter(p => p.id !== id));
 }
 
