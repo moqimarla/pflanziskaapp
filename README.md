@@ -1,5 +1,8 @@
 # Updates
-24.05. Marla -> man kann jetzt Pflanzen hinzufägen und sie werden im Local Storage gespeichert
+01.06 Marla -> App Icon da & Service Worker installiert
+31.05 Marla -> Löschbutton funktionierte nicht gut,neu gemacht 
+28.05. Marla -> API angebunden
+24.05. Marla -> man kann jetzt Pflanzen hinzufügen und sie werden im Local Storage gespeichert
 22.05. Marla -> App läuft, Menüleiste funktioniert
 
 
