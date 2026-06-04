@@ -1,50 +1,44 @@
 import { useState, useEffect } from "react";
-  import PlantMascotWidget from "../Komponents/PlantMascotWidget";
-
+import PlantMascotWidget from "../Komponents/PlantMascotWidget";
 
 export default function Home() {
   const [pflanzen, setPflanzen] = useState([]);
+  const [completedTodos, setCompletedTodos] = useState([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("pflanzen");
-    if (saved) setPflanzen(JSON.parse(saved));
+    const savedPlants = localStorage.getItem("pflanzen");
+    const savedTodos = localStorage.getItem("completedTodos");
+
+    if (savedPlants) {
+      setPflanzen(JSON.parse(savedPlants));
+    }
+
+    if (savedTodos) {
+      setCompletedTodos(JSON.parse(savedTodos));
+    }
   }, []);
 
+
+
+  //hier wird eingestelt, was dsie Angaben aus der API bedueten
   function getGiessIntervall(watering) {
     switch (watering) {
       case "Frequent":
         return 2;
+
       case "Average":
         return 7;
+
       case "Minimum":
         return 14;
+
       default:
         return 7;
     }
   }
 
-  function getStatus(pflanze) {
-    const interval = getGiessIntervall(pflanze.wasser);
 
-    if (!pflanze.letztesGiessen) {
-      return { text: "heute", icon: "💧" };
-    }
-
-    const last = new Date(pflanze.letztesGiessen);
-    const now = new Date();
-
-    const tageSeit = Math.floor(
-      (now - last) / (1000 * 60 * 60 * 24)
-    );
-
-    const tageBis = interval - tageSeit;
-
-    if (tageBis <= 0) return { text: "heute", icon: "🔴" };
-    if (tageBis === 1) return { text: "morgen", icon: "🟡" };
-
-    return { text: `in ${tageBis} Tagen`, icon: "🟢" };
-  }
-
+  //hier wird eingestellt, wann die Pflanze Wasser braucht
   function needsWater(pflanze) {
     if (!pflanze.letztesGiessen) return true;
 
@@ -59,149 +53,339 @@ export default function Home() {
     return diffDays >= interval;
   }
 
-  const needsWaterCount = pflanzen.filter(needsWater).length;
+  //hier werden die To-Dos erstelt, sind zwei Listen, einmal to-do und einmal gießstatus
+const todos = pflanzen.map((pflanze) => ({
+  id: pflanze.id,
+  text: `${pflanze.name} gießen`,
+  pflanze,
+  needsWater: needsWater(pflanze),
+}));
 
-  function getAppStatus() {
-    if (pflanzen.length === 0) {
-      return { text: "Start", icon: "🌱" };
-    }
+  const erledigt = todos.filter((t) =>
+    completedTodos.includes(t.id)
+  ).length;
 
-    if (needsWaterCount === 0) {
-      return { text: "Alles gut", icon: "🌿" };
-    }
+  const gesamt = todos.length;
 
-    if (needsWaterCount <= 2) {
-      return { text: "Okay", icon: "⚠️" };
-    }
+  const progress =
+    gesamt === 0 ? 1 : erledigt / gesamt;
 
-    return { text: "Aktion nötig", icon: "🔴" };
+  const progressPercent = progress * 100;
+
+  //Progress wird in Stimmunt umgewandelt
+  function getMoodScore() {
+    if (progress === 1) return 5;
+    if (progress >= 0.7) return 4;
+    if (progress >= 0.4) return 3;
+    if (progress >= 0.2) return 2;
+    if (progress > 0) return 1;
+
+    return 0;
   }
 
-  const appStatus = getAppStatus();
+  const moodScore = getMoodScore();
+
+  function completeTodo(todo) {
+    if (completedTodos.includes(todo.id)) return;
+
+    const updatedCompleted = [
+      ...completedTodos,
+      todo.id,
+    ];
+
+    setCompletedTodos(updatedCompleted);
+
+    localStorage.setItem(
+      "completedTodos",
+      JSON.stringify(updatedCompleted)
+    );
+
+    const updatedPlants = pflanzen.map((p) =>
+      p.id === todo.id
+        ? {
+            ...p,
+            letztesGiessen: new Date().toISOString(),
+          }
+        : p
+    );
+
+    setPflanzen(updatedPlants);
+
+    localStorage.setItem(
+      "pflanzen",
+      JSON.stringify(updatedPlants)
+    );
+
+    const neueErledigt = erledigt + 1;
+
+    if (neueErledigt === gesamt) {
+      updateStreak();
+    }
+  }
+
+  function updateStreak() {
+    const today = new Date().toDateString();
+
+    const data =
+      JSON.parse(
+        localStorage.getItem("streakData")
+      ) || {
+        streak: 0,
+        lastCompletedDay: null,
+      };
+
+    if (data.lastCompletedDay === today) {
+      return;
+    }
+
+    const yesterday = new Date();
+
+    yesterday.setDate(
+      yesterday.getDate() - 1
+    );
+
+    if (
+      data.lastCompletedDay ===
+      yesterday.toDateString()
+    ) {
+      data.streak += 1;
+    } else {
+      data.streak = 1;
+    }
+
+    data.lastCompletedDay = today;
+
+    localStorage.setItem(
+      "streakData",
+      JSON.stringify(data)
+    );
+  }
+
+  const streakData =
+    JSON.parse(
+      localStorage.getItem("streakData")
+    ) || {
+      streak: 0,
+    };
+
+  const weekDays = [
+    "Mo",
+    "Di",
+    "Mi",
+    "Do",
+    "Fr",
+    "Sa",
+    "So",
+  ];
 
   return (
     <div
       style={{
         minHeight: "100vh",
         background: "#F4FAF4",
-        padding: 16,
-        display: "flex",
-        flexDirection: "column",
-        gap: 16,
-        fontFamily: "sans-serif",
+        padding: 20,
       }}
     >
-      {/* HEADER */}
+      <h1
+        style={{
+          textAlign: "center",
+          color: "#194D1B",
+        }}
+      >
+        Hallo, Franziska!
+      </h1>
+
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          justifyContent: "center",
+          marginTop: 20,
+          marginBottom: 20,
         }}
       >
-        <h1 style={{ margin: 0 }}>Pflanziska</h1>
+        <img
+          src={`/assets/mascot/mood-${Math.round(
+            moodScore
+          )}${
+            moodScore === 0
+              ? "-angry"
+              : moodScore === 1
+              ? "-sad"
+              : moodScore === 2
+              ? "-disappointed"
+              : moodScore === 3
+              ? "-neutral"
+              : moodScore === 4
+              ? "-happy"
+              : "-very_happy"
+          }.png`}
+          alt=""
+          style={{
+            width: "50%",
+            height: "auto",
+            objectFit: "contain",
+          }}
+        />
+      </div>
+
+      <div
+        style={{
+          textAlign: "right",
+          fontWeight: "bold",
+          marginBottom: 10,
+        }}
+      >
+        {streakData.streak} 🌱
+      </div>
+
+      <div
+        style={{
+          background: "white",
+          borderRadius: 24,
+          padding: 20,
+          marginBottom: 20,
+        }}
+      >
+        <h3>Gieß-Streak</h3>
 
         <div
           style={{
-            background: "white",
-            padding: "6px 10px",
-            borderRadius: 20,
-            fontSize: 14,
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100%",
+            marginTop: 15,
           }}
         >
-          {appStatus.icon} {appStatus.text}
+          {weekDays.map((day, index) => (
+            <div
+              key={day}
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: "50%",
+                  background:
+                    index <
+                    Math.min(
+                      streakData.streak,
+                      7
+                    )
+                      ? "#8CB300"
+                      : "#DDDDDD",
+                  marginBottom: 5,
+                }}
+              />
+              <small>{day}</small>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* SUB HEADER */}
-      <div>
-        <p style={{ marginTop: 4, color: "#003300" }}>
-          Deine Pflanzenübersicht
-        </p>
-      </div>
-
-      {/* LIST */}
       <div
         style={{
           background: "white",
-          borderRadius: 20,
-          padding: 16,
+          borderRadius: 24,
+          padding: 20,
         }}
       >
-        <h3>Meine Pflanzen</h3>
+        <div
+          style={{
+            display: "flex",
+            justifyContent:
+              "space-between",
+          }}
+        >
+          <h3>Heutige To-Dos</h3>
 
-        {pflanzen.map((pflanze) => {
-          const status = getStatus(pflanze);
+          <strong>
+            {erledigt}/{gesamt}
+          </strong>
+        </div>
 
-          return (
-            <div
-              key={pflanze.id}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "6px 0",
-              }}
-            >
-              <span>
-                {status.icon} {pflanze.name}
-              </span>
-              <span>{status.text}</span>
-            </div>
-          );
-        })}
-      </div>
+        <div
+          style={{
+            height: 10,
+            background: "#E5E5E5",
+            borderRadius: 99,
+            marginBottom: 20,
+          }}
+        >
+          <div
+            style={{
+              width: `${progressPercent}%`,
+              height: "100%",
+              background: "#8CB300",
+              borderRadius: 99,
+            }}
+          />
+        </div>
 
-      {/* TODO SECTION */}
-      <div
-        style={{
-          background: "white",
-          borderRadius: 20,
-          padding: 16,
-        }}
-      >
-        <h3>Heute gießen</h3>
-
-        {needsWaterCount === 0 && (
-          <p style={{ color: "gray" }}>Alles gut gegossen 🌱</p>
+        {todos.length === 0 && (
+          <p>Keine Aufgaben heute 🌱</p>
         )}
 
-        {pflanzen.filter(needsWater).map((p) => (
-          <div
-            key={p.id}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "10px 0",
-              borderBottom: "1px solid #eee",
-            }}
-          >
-            <strong>{p.name}</strong>
+  {todos.map((todo) => {
+  const isDone = completedTodos.includes(todo.id);
 
-            <button
-              onClick={() => {
-                const updated = pflanzen.map((x) =>
-                  x.id === p.id
-                    ? {
-                        ...x,
-                        letztesGiessen: new Date().toISOString(),
-                      }
-                    : x
-                );
+  return (
+    <div
+      key={todo.id}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 14,
+        padding: "14px 12px",
+        marginBottom: 10,
+        borderRadius: 14,
+        borderBottom: "1px solid #eee",
+        background: isDone ? "#F2F2F2" : "#FAFAFA",
+        opacity: isDone ? 0.6 : 1,
+      }}
+    >
+     
+<div
+  onClick={() => completeTodo(todo)}
+  style={{
+    width: 22,
+    height: 22,
+    borderRadius: "50%",
+    border: "2px solid #8CB300",
+    background: isDone ? "#8CB300" : "transparent",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    flexShrink: 0,
+  }}
+>
+  {isDone && (
+    <span style={{ color: "white", fontSize: 14 }}>✓</span>
+  )}
+</div>
 
-                setPflanzen(updated);
-                localStorage.setItem(
-                  "pflanzen",
-                  JSON.stringify(updated)
-                );
-              }}
-            >
-              gegossen
-            </button>
-          </div>
-        ))}
-      </div>
+      <span
+        style={{
+          flex:1,
+          fontSize: 16,
+          fontWeight: 500,
+          color: isDone ? "#888" : "#1A2B1A",
+          textDecoration: isDone ? "line-through" : "none",
+        }}
+      >
+        {todo.text}
+      </span>
     </div>
   );
-  <PlantMascotWidget moodScore={3} />
+})}
+      </div>
+
+    </div>
+  );
 }

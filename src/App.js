@@ -32,7 +32,6 @@ function App() {
         
         <Navigationsleiste />
 
-        <PlantMascotWidget moodScore={mascotMood} />
       </div>
     </Router>
   );
