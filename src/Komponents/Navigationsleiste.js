@@ -2,27 +2,29 @@
 //Text muss durch icons ersetzt werden
 
 import { useLocation, Link } from "react-router-dom";
+import {FaHome, FaLeaf, FaBook, FaCog} from "react-icons/fa";
 
 export default function Navigationsleiste() {
   const location = useLocation();
+  const iconSize = window.innerWidth < 400 ? 20 : 30; // Dynamische groesse
 
   //Navigationslogik , also einfach nur Links, die da hinfuehren mit Titel
   return (
     <div style={styles.nav}>
       <Link style={styles.item(location.pathname === "/")} to="/">
-        Home
+        <FaHome size={iconSize} />
       </Link>
 
       <Link style={styles.item(location.pathname === "/pflanzen")} to="/pflanzen">
-        Pflanzen
+        <FaLeaf size={iconSize} />
       </Link>
 
       <Link style={styles.item(location.pathname === "/tagebuch")} to="/tagebuch">
-        Tagebuch
+        <FaBook size={iconSize} />
       </Link>
       
       <Link style={styles.item(location.pathname === "/einstellungen")} to="/einstellungen">
-        Einstellungen
+        <FaCog size={iconSize}  />
       </Link>
 
 
@@ -47,8 +49,9 @@ const styles = {
   item: (active) => ({
     textDecoration: "none",
     color: active ? "#8CAA08" : "#333",
-    fontWeight: "600",
-    fontSize: "18px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flex:1,
   }),
 };
-
