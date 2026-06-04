@@ -1,4 +1,5 @@
 # Updates
+04.06 Marla -> Pflanziska neue Bilder, HOme Seite läuft, To-Dos laufen, brauchen noch Sortierung, icons für Navigationsleiste. Habe gemerget Main und den Maskottchen Branch, damit wir an einer Version arbeiten
 01.06 Marla -> App Icon da & Service Worker installiert
 31.05 Marla -> Löschbutton funktionierte nicht gut,neu gemacht 
 28.05. Marla -> API angebunden
