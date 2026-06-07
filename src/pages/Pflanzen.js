@@ -1,4 +1,6 @@
 import {useState, useEffect} from "react";
+// NEU: Das Benachrichtigungs-System importieren
+import { useNotifications } from "../context/NotificationContext";
 
 //hier ist die Logik für das Speicher von PFlanzen im local storage
 export default function Pflanzen () {
@@ -7,6 +9,9 @@ export default function Pflanzen () {
         return saved ? JSON.parse(saved) : [];
 
  });
+
+ // NEU: Den Notification-Hook aktivieren
+ const { addNotification } = useNotifications();
 
  useEffect(() => {
     console.log("SAVE", pflanzen);
@@ -140,11 +145,17 @@ async function pflanzeAuswaehlen(pflanze) {
             )
         );
         setEditId(null);
+        
+        // NEU: Notification für das erfolgreiche Bearbeiten
+        addNotification("Pflanze aktualisiert 📝", `Die Änderungen an "${form.name}" wurden gespeichert.`, "info");
     } else {
         setPflanzen([
         ...pflanzen,
         { id: Date.now(), ...form }
         ]);
+
+        // NEU: Notification für das erfolgreiche Hinzufügen
+        addNotification("Pflanze eingezogen! 🌱", `"${form.name}" wurde erfolgreich zu deiner Sammlung hinzugefügt.`, "success");
     }
 
     setForm({ name: "", typ: "", datum: "" });
@@ -156,6 +167,9 @@ async function pflanzeAuswaehlen(pflanze) {
     name: pflanze.name,
     typ: pflanze.typ,
     datum: pflanze.datum,
+    wasser: pflanze.wasser || "",
+    licht: pflanze.licht || "",
+    bild: pflanze.bild || ""
   });
 
   setEditId(pflanze.id);
@@ -166,8 +180,16 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
 
  function pflanzeLoeschen(id) {
     const bestaetigt = window.confirm("Möchtest du diese Pflanze wirklich löschen?");
-     if (!bestaetigt) return;
-  setPflanzen(pflanzen.filter(p => p.id !== id));
+    if (!bestaetigt) return;
+    
+    // Namen für das Lösch-Popup kurz sichern, bevor die Pflanze aus der Liste fliegt
+    const geloeschtePflanze = pflanzen.find(p => p.id === id);
+    const nameFürNotification = geloeschtePflanze ? geloeschtePflanze.name : "Eine Pflanze";
+
+    setPflanzen(pflanzen.filter(p => p.id !== id));
+
+    // NEU: Notification für das erfolgreiche Löschen
+    addNotification("Pflanze entfernt 🗑️", `"${nameFürNotification}" wurde aus deiner Sammlung gelöscht.`, "error");
 }
 
  //ab hier nur noch styling, keine Funktion perse und: JSX, also Kommentare anders schreiben
@@ -244,7 +266,13 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
 
        {/* Button */}
        <button 
-         onClick={() => setOpen(true)}
+         onClick={() => {
+            // Beim Öffnen für eine neue Pflanze das Formular und Suchfeld leeren
+            setForm({ name: "", typ: "", datum: "", wasser: "", licht: "", bild: "" });
+            setSuchbegriff("");
+            setEditId(null);
+            setOpen(true);
+         }}
          style = {{
             position: "fixed",
             bottom: 90,
@@ -279,21 +307,24 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
                     boxSizing: "border-box",
                 }}>
                     {/* die Inputs sind eigentlich alle nach dem gleichen Prinzip aufgebaut */}
-                    <h2>Neue Pflanze</h2>
+                    <h2>{editId ? "Pflanze bearbeiten" : "Neue Pflanze"}</h2>
 
-                    <input
-                    placeholder="Pflanze suchen"
-                    value={suchbegriff}
-                    onChange={(e) => setSuchbegriff(e.target.value)}
-                    style={{
-                        width: "100%",        
-                        padding: "10px 12px", 
-                        marginBottom: 10, 
-                        borderRadius:10, 
-                        border: "1px solid #E8E8E8",
-                        boxSizing: "border-box",
-                         outline: "none",}}
-                    />
+                    {/* Suchfeld nur beim Erstellen einer neuen Pflanze anzeigen */}
+                    {!editId && (
+                        <input
+                        placeholder="Pflanze suchen"
+                        value={suchbegriff}
+                        onChange={(e) => setSuchbegriff(e.target.value)}
+                        style={{
+                            width: "100%",        
+                            padding: "10px 12px", 
+                            marginBottom: 10, 
+                            borderRadius:10, 
+                            border: "1px solid #E8E8E8",
+                            boxSizing: "border-box",
+                             outline: "none",}}
+                        />
+                    )}
 
                     {vorschlaege.map((pflanze) => (
                         <div 
@@ -358,8 +389,11 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
                         boxSizing: "border-box",
                          outline: "none",}}
                     />
-                    <button onClick={() => setOpen(false)}>Abbrechen</button>
-                    <button onClick={PflanzeSpeichern} style={{marginRight: 10}}>Hinzufügen</button>
+                    
+                    {fehler && <p style={{color: "red", fontSize: "12px", margin: "0 0 10px 0"}}>{fehler}</p>}
+
+                    <button onClick={() => { setOpen(false); setFehler(""); }}>Abbrechen</button>
+                    <button onClick={PflanzeSpeichern} style={{marginRight: 10}}>{editId ? "Speichern" : "Hinzufügen"}</button>
                 </div>
             </div>
         )}

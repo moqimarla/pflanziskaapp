@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import PlantMascotWidget from "../Komponents/PlantMascotWidget";
 
+
 export default function Home() {
   const [pflanzen, setPflanzen] = useState([]);
   const [completedTodos, setCompletedTodos] = useState([]);
