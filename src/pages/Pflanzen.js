@@ -1,6 +1,7 @@
 import {useState, useEffect} from "react";
 // NEU: Das Benachrichtigungs-System importieren
 import { useNotifications } from "../context/NotificationContext";
+import {FaPen, FaTrash, FaTint, FaSun} from "react-icons/fa";
 
 //hier ist die Logik für das Speicher von PFlanzen im local storage
 export default function Pflanzen () {
@@ -125,6 +126,38 @@ async function pflanzeAuswaehlen(pflanze) {
     }
 }
 
+function WaterIcon({ level }) {
+    const count = 
+     level === "Minimum" ? 1 :
+    level === "Average" ? 2 :
+    level === "Frequent" ? 3 : 2;
+
+    return (
+        <span style={{ display: "flex", gap: 2 }}>
+            {Array.from({ length: count }).map((_, i) => (
+                <FaTint key={i} color="#3498DB" />
+            ))}
+        </span>
+    );
+}
+
+function SunIcon({ level }) {
+    const count = 
+     level === "Low" ? 1 :
+    level === "Medium" ? 2 :
+    level === "High" ? 3 : 2;
+
+    return (
+        <span style={{ display: "flex", gap: 2 }}>
+            {Array.from({ length: count }).map((_, i) => (
+                <FaSun key={i} color="#F1C40F" />
+            ))}
+        </span>
+    );
+}
+    
+
+
  function PflanzeSpeichern() {
     if (!form.name || !form.typ) return;
     const nameExistiert = pflanzen.some(
@@ -204,43 +237,56 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
                     backgroundColor: "white", 
                     borderRadius: 14,
                     padding: 16,
-                    marginBottom: 12,
-                    boxShadow: "0px 2px8px rgba(0,0,0,0.05)",
+                    marginBottom: 14,
+                    boxShadow: "0px 4px 12px rgba(0,0,0,0.05)",
                     border: "1px solid #E8E8E8",
+
                     display: "flex",
-                    flexDirection: "space-between",
-                    gap: 12,
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    gap: 14,
                   }}>
-                    <div style={{flex: 1}}>
-                    <h2>{pflanze.name}</h2>
-                    <p>Typ: {pflanze.typ}</p>
+                    <div style={{flex: 1, display: "flex", flexDirection: "column", gap: 4}}>
+                    <h2 style ={{margin: 0, fontSize: 18}}>
+                        {pflanze.name}
+                        </h2>
+                    <p style = {{margin: 0, color: "#555", fontSize: 14}}>Typ: {pflanze.typ}</p>
                     <p>Datum: {pflanze.datum}</p>
-                    <p>Wasser: {pflanze.wasser}</p>
-                    <p>Licht: {pflanze.licht}</p>
+                    
+               {/*kleine Icons für Waasser und Sonne*/}     
+                    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                    <WaterIcon level={pflanze.wasser} />
+                    <SunIcon level={pflanze.licht} />
+                    </div>
+
+
+
+                    <div style={{display: "flex", gap: 10, marginTop: 10}}>
                       <button
                             onClick={() => startEdit(pflanze)}
                             style={{
-                                padding: "8px 12px",
-                                borderRadius: 8,
+                                background:"Transparent",
                                 border: "none",
-                                backgroundColor: "#FFD966",
                                 cursor: "pointer",
+                                padding: 6,
                             }}
                         >
-                            Bearbeiten
+                            <FaPen size={24} color="#8CB300" />
                         </button>
+
+
                          <button
                             onClick={() => pflanzeLoeschen(pflanze.id)}
                             style={{
-                                padding: "8px 12px",
-                                borderRadius: 8,
+                               background:"Transparent",
                                 border: "none",
-                                backgroundColor: "#FF8A8A",
                                 cursor: "pointer",
+                                padding: 6,
                             }}
                         >
-                            Löschen
+                            <FaTrash size={24} color="#E74C3C" />
                         </button>
+                        </div>
                         </div>
                     
                     
