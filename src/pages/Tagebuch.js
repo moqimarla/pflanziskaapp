@@ -213,7 +213,6 @@ export default function Tagebuch() {
                 ? "Tagebucheintrag bearbeiten"
                 : "Neuer Tagebucheintrag"}
             </h2>
-<!--
             <input
               name="pflanze"
               placeholder="Pflanze"
@@ -227,7 +226,7 @@ export default function Tagebuch() {
                 border: "1px solid #E8E8E8",
                 boxSizing: "border-box",
               }}
-            /> -->
+            /> 
             <select
               name="pflanzeId"
               value={form.pflanzeId}
@@ -235,7 +234,7 @@ export default function Tagebuch() {
             >
               <option value="">Pflanze auswählen</option>
 
-              {pflanzen.map((pflanze) => (
+              {tagebuch.map((pflanze) => (
                 <option
                   key={pflanze.id}
                   value={pflanze.id}
