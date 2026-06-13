@@ -1,4 +1,5 @@
 # Updates
+13.06 Marla -> API Bug-Fix gemacht, Benachrichtigungen auf HOme App, Username hinzugefügt
 12.06 Marla -> Tagebuchseite verschönert, PWA vorbereitet und läuft jetzt auf meinem handy
 07.06. Juian -> Notifications über Einstellungen Seite aktivierbar, Pflanzen-Page sendet Notifications. Alle Änderungen in Main gemerged. Maskottchen-Branch gelöscht um Verwirrung zu vermeiden.
 04.06 Marla -> Pflanziska neue Bilder, HOme Seite läuft, To-Dos laufen, brauchen noch Sortierung, icons für Navigationsleiste. Habe gemerget Main und den Maskottchen Branch, damit wir an einer Version arbeiten
