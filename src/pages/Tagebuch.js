@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import {FaPen, FaTrash} from "react-icons/fa";
+import { useNotifications } from "../context/NotificationContext";
 
 export default function Tagebuch() {
   const [tagebuch, setTagebuch] = useState(() => {
@@ -12,11 +14,18 @@ export default function Tagebuch() {
 
   const [open, setOpen] = useState(false);
 
+  const { addNotification } = useNotifications();
+
   const [form, setForm] = useState({
     datum: "",
     pflanzenId: "",
-    typ: "",
     eintrag: "",
+    bild: "",
+  });
+
+  const [pflanzen] = useState(() => {
+    const saved = localStorage.getItem("pflanzen");
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [editId, setEditId] = useState(null);
@@ -29,7 +38,7 @@ export default function Tagebuch() {
   }
 
   function TagebuchSpeichern() {
-    if (!form.datum || !form.pflanze || !form.eintrag) return;
+    if (!form.datum || !form.pflanzenId || !form.eintrag) return;
 
     if (editId) {
       setTagebuch(
@@ -38,6 +47,8 @@ export default function Tagebuch() {
         )
       );
       setEditId(null);
+
+      addNotification("Eintrag aktualisiert 📝", `Die Änderungen an "${form.datum, form.pflanzenId}" wurden gespeichert.`, "info");
     } else {
       setTagebuch([
         ...tagebuch,
@@ -46,13 +57,14 @@ export default function Tagebuch() {
           ...form,
         },
       ]);
+      addNotification("Tagebucheintrag hinzugefügt! 🌱", `"${form.datum}" wurde erfolgreich zu deinem Tagebuch hinzugefügt.`, "success");
     }
 
     setForm({
       datum: "",
-      pflanze: "",
-      typ: "",
+      pflanzenId: "",
       eintrag: "",
+      bild: "",
     });
 
     setOpen(false);
@@ -61,9 +73,9 @@ export default function Tagebuch() {
   function startEdit(eintrag) {
     setForm({
       datum: eintrag.datum,
-      pflanze: eintrag.pflanze,
-      typ: eintrag.typ,
+      pflanzenId: eintrag.pflanzenId,
       eintrag: eintrag.eintrag,
+      bild: eintrag.bild,
     });
 
     setEditId(eintrag.id);
@@ -71,8 +83,19 @@ export default function Tagebuch() {
   }
 
   function tagebuchLoeschen(id) {
+    const bestaetigt = window.confirm("Möchtest du diesen Eintrag wirklich löschen?");
+    if (!bestaetigt) return;
+    
+    // Namen für das Lösch-Popup kurz sichern, bevor der Eintrag aus der Liste fliegt
+    const geloeschtereintrag = tagebuch.find(p => p.id === id);
+    const pflanze = geloeschtereintrag ? pflanzen.find(p => p.id === Number(geloeschtereintrag.pflanzenId)) : null;
+    const nameFürNotification = pflanze ? pflanze.name : "Ein Eintrag";
+
     setTagebuch(tagebuch.filter((t) => t.id !== id));
-  }
+
+    // NEU: Notification für das erfolgreiche Löschen
+    addNotification("Eintrag entfernt 🗑️", `"${nameFürNotification}" wurde aus deiner Sammlung gelöscht.`, "error");
+}
 
   function popupSchliessen() {
     setOpen(false);
@@ -80,11 +103,33 @@ export default function Tagebuch() {
 
     setForm({
       datum: "",
-      pflanze: "",
-      typ: "",
+      pflanzenId: "",
       eintrag: "",
+      bild: "",
     });
   }
+
+  function handleBildChange(e) {
+      const file = e.target.files[0];
+
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+          setForm(prev => ({
+              ...prev,
+              bild: reader.result,
+          }));
+      };
+
+      reader.readAsDataURL(file);
+  }
+
+
+
+
+
 
   return (
     <div
@@ -100,72 +145,87 @@ export default function Tagebuch() {
         <p>Noch keine Einträge vorhanden.</p>
       )}
 
-      {tagebuch.map((eintrag) => (
-        <div
-          key={eintrag.id}
-          style={{
-            backgroundColor: "white",
-            borderRadius: 14,
-            padding: 16,
-            marginBottom: 12,
-            boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
-            border: "1px solid #E8E8E8",
-          }}
-        >
-          <h2>{eintrag.pflanze}</h2>
+      {tagebuch.map((eintrag) => {
+        const pflanze = pflanzen.find(
+            p => p.id === Number(eintrag.pflanzenId)
+        );
 
-          <p
-            style={{
-              color: "#777",
-              fontSize: 14,
-            }}
-          >
-            {eintrag.datum}
-          </p>
-
-          {eintrag.typ && (
-            <p>
-              <strong>Typ:</strong> {eintrag.typ}
-            </p>
-          )}
-
-          <p>{eintrag.eintrag}</p>
-
+        return (
           <div
+            key={eintrag.id}
             style={{
+              backgroundColor: "white",
+              borderRadius: 14,
+              padding: 16,
+              marginBottom: 12,
+              boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
+              border: "1px solid #E8E8E8",
               display: "flex",
-              gap: 10,
-              marginTop: 12,
+              justifyContent: "space-between",
+              gap: 16,
             }}
           >
-            <button
-              onClick={() => startEdit(eintrag)}
-              style={{
-                padding: "8px 12px",
-                borderRadius: 8,
-                border: "none",
-                backgroundColor: "#FFD966",
-                cursor: "pointer",
-              }}
-            >
-              Bearbeiten
-            </button>
+            <div style={{ flex: 1 }}>
+              <h2>{eintrag.datum}</h2>
 
-            <button
-              onClick={() => tagebuchLoeschen(eintrag.id)}
-              style={{
-                padding: "8px 12px",
-                borderRadius: 8,
-                border: "none",
-                backgroundColor: "#FF8A8A",
-                cursor: "pointer",
-              }}
-            >
-              Löschen
-            </button>
+              <p
+                style={{
+                  color: "#777",
+                  fontSize: 14,
+                }}
+              >
+                {pflanze?.name}
+              </p>
+
+              <p>
+                {eintrag.eintrag.length > 100 
+                  ? eintrag.eintrag.substring(0, 100) + '...' 
+                  : eintrag.eintrag}
+              </p>
+
+              <div style={{display: "flex", gap: 10, marginTop: 10}}>
+                <button
+                  onClick={() => startEdit(eintrag)}
+                  style={{
+                    background:"Transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 6,
+                  }}
+                >
+                  <FaPen size={24} color="#8CB300" />
+                </button>
+
+                <button
+                  onClick={() => tagebuchLoeschen(eintrag.id)}
+                  style={{
+                    background:"Transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 6,
+                  }}
+                >
+                  <FaTrash size={24} color="#E74C3C" />
+                </button>
+              </div>
+            </div>
+
+            {eintrag.bild && (
+              <img
+                src={eintrag.bild}
+                alt=""
+                style={{
+                  width: 240,
+                  height: 240,
+                  objectFit: "cover",
+                  borderRadius: 12,
+                  flexShrink: 0,
+                }}
+              />
+            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
 
       <button
         onClick={() => setOpen(true)}
@@ -184,6 +244,7 @@ export default function Tagebuch() {
         +
       </button>
 
+      {/* Popup für neuen Eintrag oder Bearbeitung eines bestehenden Eintrags */}
       {open && (
         <div
           style={{
@@ -213,10 +274,10 @@ export default function Tagebuch() {
                 ? "Tagebucheintrag bearbeiten"
                 : "Neuer Tagebucheintrag"}
             </h2>
-            <input
-              name="pflanze"
-              placeholder="Pflanze"
-              value={form.pflanze}
+            
+            <select
+              name="pflanzenId"
+              value={form.pflanzenId}
               onChange={handleChange}
               style={{
                 width: "100%",
@@ -225,16 +286,11 @@ export default function Tagebuch() {
                 borderRadius: 10,
                 border: "1px solid #E8E8E8",
                 boxSizing: "border-box",
-              }}
-            /> 
-            <select
-              name="pflanzeId"
-              value={form.pflanzeId}
-              onChange={handleChange}
+            }}
             >
               <option value="">Pflanze auswählen</option>
 
-              {tagebuch.map((pflanze) => (
+              {pflanzen.map((pflanze) => (
                 <option
                   key={pflanze.id}
                   value={pflanze.id}
@@ -243,21 +299,6 @@ export default function Tagebuch() {
                 </option>
               ))}
             </select>
-
-            <input
-              name="typ"
-              placeholder="Typ"
-              value={form.typ}
-              onChange={handleChange}
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                marginBottom: 10,
-                borderRadius: 10,
-                border: "1px solid #E8E8E8",
-                boxSizing: "border-box",
-              }}
-            />
 
             <input
               name="datum"
@@ -280,6 +321,7 @@ export default function Tagebuch() {
               value={form.eintrag}
               onChange={handleChange}
               rows={5}
+              maxLength={500}
               style={{
                 width: "100%",
                 padding: "10px 12px",
@@ -289,6 +331,12 @@ export default function Tagebuch() {
                 boxSizing: "border-box",
                 resize: "none",
               }}
+            />
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleBildChange}
             />
 
             <div
