@@ -119,7 +119,7 @@ async function pflanzeAuswaehlen(pflanze) {
         });
 
         setVorschlaege([]);
-        setSuchbegriff(pflanze.common_name || "");
+        setSuchbegriff("");
 
     } catch (error) {
         console.error("Fehler beim Abrufen der Pflanzendetails:", error);
@@ -356,7 +356,7 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
                     <h2>{editId ? "Pflanze bearbeiten" : "Neue Pflanze"}</h2>
 
                     {/* Suchfeld nur beim Erstellen einer neuen Pflanze anzeigen */}
-                    {!editId && (
+                    {!editId && form.name === "" && (
                         <input
                         placeholder="Pflanze suchen"
                         value={suchbegriff}

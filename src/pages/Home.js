@@ -1,14 +1,24 @@
 import { useState, useEffect } from "react";
 import PlantMascotWidget from "../Komponents/PlantMascotWidget";
+import { useNotifications } from "../context/NotificationContext";
+
 
 
 export default function Home() {
   const [pflanzen, setPflanzen] = useState([]);
   const [completedTodos, setCompletedTodos] = useState([]);
+  const [username, setUsername] = useState("");
+  const {addNotification} = useNotifications();
+
 
   useEffect(() => {
     const savedPlants = localStorage.getItem("pflanzen");
     const savedTodos = localStorage.getItem("completedTodos");
+    const savedUsername = localStorage.getItem("username");
+
+    if (savedUsername) {
+      setUsername(savedUsername);
+    }
 
     if (savedPlants) {
       setPflanzen(JSON.parse(savedPlants));
@@ -18,6 +28,36 @@ export default function Home() {
       setCompletedTodos(JSON.parse(savedTodos));
     }
   }, []);
+
+
+  //Benachrichtigungen für offenen To-Dos
+useEffect(() => {
+  if (pflanzen.length === 0) return;
+
+  const today = new Date().toDateString();
+  const last = localStorage.getItem("todoNotificationDate");
+
+  if (last === today) return;
+
+  const todos = pflanzen.map((pflanze) => ({
+    id: pflanze.id,
+    text: `${pflanze.name} gießen`,
+    pflanze,
+    needsWater: needsWater(pflanze),
+  }));
+
+  const offeneTodos = todos.filter(
+    (t) => !completedTodos.includes(t.id)
+  );
+
+  addNotification(
+    "Heutige To-Dos 🌱",
+    `Du hast noch ${offeneTodos.length} Aufgaben zu erledigen.`,
+    "info"
+  );
+
+  localStorage.setItem("todoNotificationDate", today);
+}, [pflanzen, completedTodos]);
 
 
 
@@ -193,8 +233,8 @@ const todos = pflanzen.map((pflanze) => ({
           color: "#194D1B",
         }}
       >
-        Hallo, Franziska!
-      </h1>
+         Hallo{username ? `, ${username}` : ""}!     
+         </h1>
 
       <div
         style={{
