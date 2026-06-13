@@ -59,23 +59,7 @@ export default function Pflanzen () {
     });
  }
 
- /*function PflanzeHinzufuegen() {
-    if (!form.name || !form.typ) return;
 
-    setPflanzen([
-        ...pflanzen,
- {id: Date.now(),
-    ...form,
- },
-    ]);
- 
-    setForm({
-        name: "",
-        typ: "",
-        datum: "",
-    });
-    setOpen(false);
- }*/
 
     //das ist dfie API verknüpfung. Wird auf maximal 4 Eintraege reduziert, die angezeigt werden,
     //suche nur alle 500ms, damit wir nicht szu viele Anfragen haben
@@ -110,8 +94,8 @@ async function pflanzeAuswaehlen(pflanze) {
         const data = await response.json();
 
         setForm({
-            name: pflanze.scientific_name?.[0] || "",
-            typ: pflanze.common_name || "",
+            typ: pflanze.common_name || 
+            pflanze.scientific_name?.[0] || "",
             datum: "",
             wasser: data.watering || "",
             licht: data.sunlight?.join(", ") || "",
@@ -253,7 +237,7 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
                     <p style = {{margin: 0, color: "#555", fontSize: 14}}>Typ: {pflanze.typ}</p>
                     <p>Datum: {pflanze.datum}</p>
                     
-               {/*kleine Icons für Waasser und Sonne*/}     
+               {/*kleine Icons für Wasser und Sonne*/}     
                     <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                     <WaterIcon level={pflanze.wasser} />
                     <SunIcon level={pflanze.licht} />
