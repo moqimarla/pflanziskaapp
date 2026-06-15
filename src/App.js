@@ -18,7 +18,7 @@ function App() {
   return (
     <NotificationProvider>
       <Router>
-        <div style={{ position: "relative", minHeight: "100vh" }}>
+        <div style={{ position: "relative", minHeight: "100vh", paddingBottom: "80px" }}>
           <Navigationsleiste />
           
           <Routes>

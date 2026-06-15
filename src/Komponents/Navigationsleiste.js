@@ -10,6 +10,8 @@ export default function Navigationsleiste() {
 
   //Navigationslogik , also einfach nur Links, die da hinfuehren mit Titel
   return (
+
+    
     <div style={styles.nav}>
       <Link style={styles.item(location.pathname === "/")} to="/">
         <FaHome size={iconSize} />
@@ -26,6 +28,7 @@ export default function Navigationsleiste() {
       <Link style={styles.item(location.pathname === "/einstellungen")} to="/einstellungen">
         <FaCog size={iconSize}  />
       </Link>
+
 
 
     </div>
