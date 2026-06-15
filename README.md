@@ -1,4 +1,5 @@
 # Updates
+15.06 Marla -> kleiner Bug Fix, Navigationsleiste verschwand immer mit Text, jettz überlagert.
 13.06 Mei -> Tagebucheinträge können hinzugefügt, bearbeitet und gelöscht werden
 13.06 Marla -> API Bug-Fix gemacht, Benachrichtigungen auf Home App, Username hinzugefügt
 12.06 Marla -> Tagebuchseite verschönert, PWA vorbereitet und läuft jetzt auf meinem handy
