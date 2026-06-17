@@ -12,6 +12,15 @@ root.render(
   </React.StrictMode>
 );
 
+serviceWorkerRegistration.register({
+  onUpdate: registration => {
+    if (registration && registration.waiting) {
+      registration.waiting.postMessage({ type: "SKIP_WAITING" });
+      window.location.reload();
+    }
+  }
+});
+
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals

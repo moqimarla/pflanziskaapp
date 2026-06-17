@@ -14,13 +14,16 @@ function Einstellungen() {
 
 const [name, setName] = useState("");
 
+const [mascot, setMascot] = useState("Pflanziska");
 
 //////////////////////
-//Marla: hier ist das für die Namen
+//Marla: hier ist das für die Namen & Florian/Pflanziska auswahl 
 
   useEffect(() => {
     const saved = localStorage.getItem("username");
     if (saved) setName(saved);
+    const savedMascot = localStorage.getItem("mascot");
+    if (savedMascot) setMascot(savedMascot);
   }, []);
 
   function handleSaveName(e) {
@@ -29,6 +32,15 @@ const [name, setName] = useState("");
     localStorage.setItem("username", value);
   }
 
+function handleMascotChange(e) {
+
+  const value = e.target.value;
+
+  setMascot(value);
+
+  localStorage.setItem("mascot", value);
+
+}
 
   /////////////////////
 
@@ -53,6 +65,7 @@ const [name, setName] = useState("");
         borderRadius: '8px',
         backgroundColor: '#f9f9f9'
       }}>
+
         <h3 style={{ marginTop: 0 }}>Dein Name</h3>
 
         <input
@@ -68,6 +81,36 @@ const [name, setName] = useState("");
         }}
         />
       </div>
+
+
+<div
+  style={{
+    marginTop: "20px",
+    padding: "20px",
+    border: "1px solid #e0e0e0",
+    borderRadius: "8px",
+    backgroundColor: "#f9f9f9"
+  }}
+>
+  <h3 style={{ marginTop: 0 }}>Maskottchen</h3>
+
+
+
+  <select
+    value={mascot}
+    onChange={handleMascotChange}
+    style={{
+      width: "100%",
+      padding: "10px",
+      borderRadius: "8px",
+      border: "1px solid #ccc"
+    }}
+  >
+    <option value="pflanziska">Pflanziska</option>
+    <option value="florian">Florian</option>
+  </select>
+</div>
+
 
 
       <div style={{ 

@@ -9,13 +9,37 @@ const MASCOT_CONFIG = {
   5: { image: '/assets/mascot/mood-5-very_happy.png', alt: 'Sehr glücklich', text: 'Woohoo! Ich blühe!' }
 };
 
+
+
+
 export default function PlantMascotWidget({ moodScore }) {
   const [isOpen, setIsOpen] = useState(false);
+
+const mascotType =
+  localStorage.getItem("mascot") || "pflanziska";
 
   const currentMascot = useMemo(() => {
     const roundedMood = Math.round(moodScore);
     const safeMood = Math.max(0, Math.min(5, roundedMood));
-    return MASCOT_CONFIG[safeMood];
+const mascotType = localStorage.getItem("mascot") || "pflanziska";
+
+
+return {
+...MASCOT_CONFIG[safeMood], 
+image: `/assets/mascot/${mascotType}-mood-${safeMood}${
+safeMood ===0 
+? '-angry'
+: safeMood === 1
+? '-sad'
+: safeMood === 2
+? '-disappointed'
+: safeMood === 3
+? '-neutral'
+: safeMood === 4
+? '-happy'
+: '-very_happy'
+}.png`,
+};
   }, [moodScore]);
 
   return (
