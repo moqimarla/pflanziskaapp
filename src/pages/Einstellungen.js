@@ -14,7 +14,7 @@ function Einstellungen() {
 
 const [name, setName] = useState("");
 
-const [mascot, setMascot] = useState("Pflanziska");
+const [mascot, setMascot] = useState("pflanziska");
 
 //////////////////////
 //Marla: hier ist das für die Namen & Florian/Pflanziska auswahl 
@@ -39,6 +39,7 @@ function handleMascotChange(e) {
   setMascot(value);
 
   localStorage.setItem("mascot", value);
+  window.dispatchEvent(new Event("mascotChange")); // Informiere alle Komponenten über die Änderung
 
 }
 
@@ -92,23 +93,85 @@ function handleMascotChange(e) {
     backgroundColor: "#f9f9f9"
   }}
 >
+
+
+ {/* Pflanziska/Florian wählen */}
+  
+<div
+  style={{
+    marginTop: "20px",
+    padding: "20px",
+    border: "1px solid #e0e0e0",
+    borderRadius: "8px",
+    backgroundColor: "#f9f9f9"
+  }}
+>
   <h3 style={{ marginTop: 0 }}>Maskottchen</h3>
 
-
-
-  <select
-    value={mascot}
-    onChange={handleMascotChange}
+  <div
     style={{
-      width: "100%",
-      padding: "10px",
-      borderRadius: "8px",
-      border: "1px solid #ccc"
+      display: "flex",
+      gap: "20px",
+      justifyContent: "center"
     }}
   >
-    <option value="pflanziska">Pflanziska</option>
-    <option value="florian">Florian</option>
-  </select>
+    {/* Pflanziska */}
+    <div
+      onClick={() => {
+        setMascot("pflanziska");
+        localStorage.setItem("mascot", "pflanziska");
+        window.dispatchEvent(new Event("mascotChange"));
+      }}
+      style={{
+        cursor: "pointer",
+        textAlign: "center"
+      }}
+    >
+      <img
+        src="/assets/mascot/pflanziska/mood-4-happy.png"
+        alt="Pflanziska"
+        style={{
+          width: "100px",
+          filter:
+            mascot === "pflanziska"
+              ? "none"
+              : "grayscale(100%)",
+          transition: "0.2s"
+        }}
+      />
+      <p style = {{margin:0}}>Pflanziska</p>
+    </div>
+
+    {/* Florian */}
+    <div
+      onClick={() => {
+        setMascot("florian");
+        localStorage.setItem("mascot", "florian");
+        window.dispatchEvent(new Event("mascotChange"));
+      }}
+      style={{
+        cursor: "pointer",
+        textAlign: "center"
+      }}
+    >
+      <img
+        src="/assets/mascot/florian/mood-4-happy.png"
+        alt="Florian"
+        style={{
+          width: "100px",
+          filter:
+            mascot === "florian"
+              ? "none"
+              : "grayscale(100%)",
+          transition: "0.2s"
+        }}
+      />
+      <p style = {{margin:0}}>Florian</p>
+    </div>
+  </div>
+</div>
+
+  
 </div>
 
 

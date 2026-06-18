@@ -11,6 +11,24 @@ export default function Home() {
   const {addNotification} = useNotifications();
 
 
+
+  //Florian /Pflanziska wechseln 
+  const [mascotType, setMascotType] = useState(
+  localStorage.getItem("mascot") || "pflanziska"
+);
+
+useEffect(() => {
+  const handler = () => {
+    setMascotType(localStorage.getItem("mascot") || "pflanziska");
+  };
+  window.addEventListener("mascotChange", handler);
+  return () => window.removeEventListener("mascotChange", handler);
+}, []);
+
+
+
+
+
   useEffect(() => {
     const savedPlants = localStorage.getItem("pflanzen");
     const savedTodos = localStorage.getItem("completedTodos");
@@ -245,21 +263,14 @@ const todos = pflanzen.map((pflanze) => ({
         }}
       >
         <img
-          src={`/assets/mascot/mood-${Math.round(
-            moodScore
-          )}${
-            moodScore === 0
-              ? "-angry"
-              : moodScore === 1
-              ? "-sad"
-              : moodScore === 2
-              ? "-disappointed"
-              : moodScore === 3
-              ? "-neutral"
-              : moodScore === 4
-              ? "-happy"
-              : "-very_happy"
-          }.png`}
+  src={`/assets/mascot/${mascotType}/mood-${Math.round(moodScore)}${
+    moodScore === 0 ? "-angry"
+    : moodScore === 1 ? "-sad"
+    : moodScore === 2 ? "-disappointed"
+    : moodScore === 3 ? "-neutral"
+    : moodScore === 4 ? "-happy"
+    : "-very_happy"
+  }.png`}
           alt=""
           style={{
             width: "50%",
@@ -426,7 +437,6 @@ const todos = pflanzen.map((pflanze) => ({
   );
 })}
       </div>
-
     </div>
   );
 }
