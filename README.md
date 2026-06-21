@@ -1,4 +1,5 @@
 # Updates
+21.06 Marla -> In den Einstellungen kann man jetzt Statistik ansehen und alle Daten löschen
 18.06 Marla -> Florian und Pflanziska gehen jetzt, in den Einstellungen kann man jetzt ein Bild auswählen, State wird für HomePage übernommen
 17.06 Marla -> Vorbereitung für Pflanziska und Florian in den Einstellungen
 15.06 Marla -> kleiner Bug Fix, Navigationsleiste verschwand immer mit Text, jettz überlagert.
