@@ -16,8 +16,20 @@ const [name, setName] = useState("");
 
 const [mascot, setMascot] = useState("pflanziska");
 
-//////////////////////
-//Marla: hier ist das für die Namen & Florian/Pflanziska auswahl 
+const [plants, setPlants] = useState([]);
+
+
+//Pflanzen für Statistik reinladen 
+
+useEffect(() => {
+
+const savedPlants = JSON.parse(localStorage.getItem("pflanzen")) || [];
+  setPlants(savedPlants);
+
+}, []);
+
+const plantCount = plants.length;
+////////////////////// hier ist das für die Namen & Florian/Pflanziska auswahl 
 
   useEffect(() => {
     const saved = localStorage.getItem("username");
@@ -43,6 +55,25 @@ function handleMascotChange(e) {
 
 }
 
+
+//Funktion zum Löschen 
+
+function handleDeleteData() {
+  const confirmed = window.confirm(
+    "Möchtest du wirklich alle  Daten löschen?\n\nDiese Aktion kann nicht rückgängig gemacht werden."
+  );
+
+  if (!confirmed) return;
+
+  localStorage.clear();
+
+  alert("Alle Daten wurden gelöscht.");
+
+  window.location.reload();
+}
+
+
+
   /////////////////////
 
   // Funktion zum Umschalten nutzt jetzt die globale Funktion
@@ -55,6 +86,9 @@ function handleMascotChange(e) {
       <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px' }}>
         Einstellungen
       </h1>
+
+
+
 
       {/* Benutzername */}
       <div style={{ 
@@ -93,6 +127,9 @@ function handleMascotChange(e) {
     backgroundColor: "#f9f9f9"
   }}
 >
+
+
+
 
 
  {/* Pflanziska/Florian wählen */}
@@ -174,7 +211,7 @@ function handleMascotChange(e) {
   
 </div>
 
-
+ {/* Benachrichtigungen */}
 
       <div style={{ 
         display: 'flex', 
@@ -232,7 +269,60 @@ function handleMascotChange(e) {
       <div style={{ marginTop: '20px', fontSize: '14px', color: '#888' }}>
         Status: {notificationsEnabled ? 'Aktiviert' : 'Deaktiviert'}
       </div>
+
+
+ {/* Statistik */}
+
+        <div style = {{
+          marginTop: "20px",
+          padding: "20px",
+          border: "1px solid #e0e0e0",
+          borderRadius:"8px",
+          backgroundColor: "#f9f9f9"
+        }}> 
+        <h3 style={{ marginTop: 0 }}>Statistik</h3>
+        <p> Pflanzen insgesamt: <strong> {plantCount}</strong></p>
+        
     </div>
+          <div
+  style={{
+    marginTop: "20px",
+    padding: "20px",
+    border: "1px solid #e0e0e0",
+    borderRadius: "8px",
+    backgroundColor: "#f9f9f9"
+  }}
+>
+
+
+   {/* Daten löschen */}
+
+  <h3 style={{ marginTop: 0 }}>Daten</h3>
+
+  <p style={{ color: "#666", marginBottom: "15px" }}>
+    Löscht alle Pflanzen und Einstellungen dauerhaft.
+  </p>
+
+  <button
+    onClick={handleDeleteData}
+    style={{
+      backgroundColor: "#d32f2f",
+      color: "white",
+      border: "none",
+      padding: "10px 16px",
+      borderRadius: "8px",
+      cursor: "pointer",
+      fontWeight: "bold"
+    }}
+  >
+    Alle Daten löschen
+  </button>
+</div>
+
+
+    </div>
+
+  
   );
 }
 
