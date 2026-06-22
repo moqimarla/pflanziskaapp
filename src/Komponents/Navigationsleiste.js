@@ -47,6 +47,7 @@ const styles = {
     justifyContent: "space-around",
     alignItems: "center",
     backgroundColor: "white",
+  zIndex:1000,
   },
 
   item: (active) => ({
@@ -56,5 +57,6 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     flex:1,
+
   }),
 };
