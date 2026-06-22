@@ -142,46 +142,100 @@ const todos = pflanzen.map((pflanze) => ({
     return 0;
   }
 
+
+
+//neue Logikfunktion, ToDos können jetzt abgehakt und resettet werden, Pflanziskas Emotionen verändern sich auch mit
   const moodScore = getMoodScore();
 
   function completeTodo(todo) {
-    if (completedTodos.includes(todo.id)) return;
+    
+    const isDone = completedTodos.includes(todo.id);
 
-    const updatedCompleted = [
-      ...completedTodos,
-      todo.id,
-    ];
+    if (isDone) {
+  const updateCompleted = completedTodos.filter (
+(id) => id !== todo.id
+);
 
-    setCompletedTodos(updatedCompleted);
+setCompletedTodos(updateCompleted);
 
-    localStorage.setItem(
-      "completedTodos",
-      JSON.stringify(updatedCompleted)
-    );
+localStorage.setItem(
+"completedTodos",
+JSON.stringify(updateCompleted)
+);
 
-    const updatedPlants = pflanzen.map((p) =>
-      p.id === todo.id
-        ? {
-            ...p,
-            letztesGiessen: new Date().toISOString(),
-          }
-        : p
-    );
 
-    setPflanzen(updatedPlants);
+const updatedPlants = pflanzen.map((p) =>
+  p.id === todo.id
+    ? { ...p, letztesGiessen: null }
+    : p
+);
 
-    localStorage.setItem(
-      "pflanzen",
-      JSON.stringify(updatedPlants)
-    );
+setPflanzen (updatedPlants);
+localStorage.setItem(
+"pflanzen", 
+JSON.stringify(updatedPlants)
+);
+return;
+}
 
-    const neueErledigt = erledigt + 1;
+const updateCompleted = [
 
-    if (neueErledigt === gesamt) {
-      updateStreak();
-    }
+    ...completedTodos,
+
+    todo.id,
+
+  ];
+
+  setCompletedTodos(updateCompleted);
+
+  localStorage.setItem(
+
+    "completedTodos",
+
+    JSON.stringify(updateCompleted)
+
+  );
+
+  const updatedPlants = pflanzen.map((p) =>
+
+    p.id === todo.id
+
+      ? {
+
+          ...p,
+
+          letztesGiessen: new Date().toISOString(),
+
+        }
+
+      : p
+
+  );
+
+  setPflanzen(updatedPlants);
+
+  localStorage.setItem(
+
+    "pflanzen",
+
+    JSON.stringify(updatedPlants)
+
+  );
+
+  const neueErledigt = erledigt + 1;
+
+  if (neueErledigt === gesamt) {
+
+    updateStreak();
+
   }
 
+}
+
+
+
+//Streak update Funktion
+ 
   function updateStreak() {
     const today = new Date().toDateString();
 
