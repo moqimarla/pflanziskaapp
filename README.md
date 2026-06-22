@@ -1,4 +1,5 @@
 # Updates
+22.06 Marla -> To-Dos können jetzt auch wieder nach dem Aktivieren deaktiviert werden. Der Mood des Maskottchen ändert sich.
 22.06 Marla -> Navigationsleiste bug mit zIndex gelöst
 21.06 Marla -> In den Einstellungen kann man jetzt Statistik ansehen und alle Daten löschen
 18.06 Marla -> Florian und Pflanziska gehen jetzt, in den Einstellungen kann man jetzt ein Bild auswählen, State wird für HomePage übernommen
