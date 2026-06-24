@@ -119,7 +119,7 @@ function WaterIcon({ level }) {
     return (
         <span style={{ display: "flex", gap: 2 }}>
             {Array.from({ length: count }).map((_, i) => (
-                <FaTint key={i} color="#3498DB" />
+                <FaTint key={i} color="#3498DB" size = {24} />
             ))}
         </span>
     );
@@ -134,7 +134,7 @@ function SunIcon({ level }) {
     return (
         <span style={{ display: "flex", gap: 2 }}>
             {Array.from({ length: count }).map((_, i) => (
-                <FaSun key={i} color="#F1C40F" />
+                <FaSun key={i} color="#F1C40F" size = {24} />
             ))}
         </span>
     );
@@ -216,36 +216,62 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
         <div style = {{padding:20, backgroundColor: "#F4FAF4", minHeight: "100vh"}}>      {/* hier muss noch iwann der username rein */}  
             <h1>Meine Pflanzen</h1>
             {/*Liste  */}
+<div style = {{
+display: "grid",
+gridTemplateColumns: "repeat(2,1fr)",
+gap: 16,}}>
             {pflanzen.map((pflanze) => (
-                <div key={pflanze.id} style={{
+                
+                    <div key={pflanze.id} 
+                    style={{
                     backgroundColor: "white", 
-                    borderRadius: 14,
+                    borderRadius: 18,
                     padding: 16,
                     marginBottom: 14,
                     boxShadow: "0px 4px 12px rgba(0,0,0,0.05)",
                     border: "1px solid #E8E8E8",
 
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
+                    flexDirection: "column",
+                    alignItems: "center",
                     gap: 14,
                   }}>
-                    <div style={{flex: 1, display: "flex", flexDirection: "column", gap: 4}}>
-                    <h2 style ={{margin: 0, fontSize: 18}}>
-                        {pflanze.name}
-                        </h2>
-                    <p style = {{margin: 0, color: "#555", fontSize: 14}}>Typ: {pflanze.typ}</p>
-                    <p>Datum: {pflanze.datum}</p>
+
+
+{/*Bild*/}
+<img
+  src={pflanze.bild || "/assets/mascot/pflanziska/mood-4-happy.png"}
+  alt={pflanze.name}
+  style={{
+    width: "100%",
+    height: 160,
+    objectFit: "cover",
+borderRadius: 14,
+
+  }}
+  onError={(e) => {
+    e.target.onerror = null;
+    e.target.src =  "/assets/mascot/pflanziska/mood-4-happy.png";
+  }}
+/>     
+
+
+
+                    <div style={{padding: 12, textAlign:"center"}}>
+
+                    <h2 style ={{margin: 0, fontSize: 18}}> {pflanze.name} </h2>
+                    <p style = {{margin: 3, color: "#555", fontSize: 14}}> {pflanze.typ}</p>
+                    <p style = {{margin: 3, color: "#555", fontSize: 14}}> {pflanze.datum}</p>
                     
                {/*kleine Icons für Wasser und Sonne*/}     
-                    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                    <div style={{ display: "flex", gap: 10, justifyContent: "center", margin: 10 }}>
                     <WaterIcon level={pflanze.wasser} />
                     <SunIcon level={pflanze.licht} />
                     </div>
 
 
 
-                    <div style={{display: "flex", gap: 10, marginTop: 10}}>
+                    <div style={{display: "flex", justifyContent: "space-between", marginTop: 10,}}>
                       <button
                             onClick={() => startEdit(pflanze)}
                             style={{
@@ -255,7 +281,7 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
                                 padding: 6,
                             }}
                         >
-                            <FaPen size={24} color="#8CB300" />
+                            <FaPen size={18} color="#8CB300" />
                         </button>
 
 
@@ -265,35 +291,17 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
                                background:"Transparent",
                                 border: "none",
                                 cursor: "pointer",
-                                padding: 6,
+                             
                             }}
                         >
-                            <FaTrash size={24} color="#E74C3C" />
+                            <FaTrash size={18} color="#E74C3C" />
                         </button>
                         </div>
-                        </div>
-                    
-                    
+                      </div>
 
-
-
-                    {pflanze.bild && (
-                    <img 
-                         src={pflanze.bild}
-                         alt={pflanze.name}
-                          style={{ width: "20%", height: "20%", objectFit: "cover", borderRadius: 10, marginTop: 10 }}
-                        />
-)}
-                    <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-    
-                     
-
-                   
-
-                    </div>
                 </div>
-            ))}
-
+))}
+</div>
        {/* Button */}
        <button 
          onClick={() => {
