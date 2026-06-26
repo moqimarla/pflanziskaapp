@@ -1,4 +1,5 @@
 # Updates
+24.06 Marla -> Pflanzenseite verschönert, Karten sehen jetzt besser aus. Werde die Lösch/Bearbeiten Buttons nochmal anpassen.
 22.06 Marla -> To-Dos können jetzt auch wieder nach dem Aktivieren deaktiviert werden. Der Mood des Maskottchen ändert sich.
 22.06 Marla -> Navigationsleiste bug mit zIndex gelöst
 21.06 Marla -> In den Einstellungen kann man jetzt Statistik ansehen und alle Daten löschen
