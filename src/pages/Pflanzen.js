@@ -365,12 +365,12 @@ borderRadius: 14,
         }}
     />                
                     <input
-    name="typ"
-    placeholder="Pflanzentyp suchen"
-    value={form.typ}
-    onChange={(e) => {
-        handleChange(e);
-        setSuchbegriff(e.target.value);
+                    name="typ"
+                     placeholder="Pflanzentyp suchen"
+                    value={form.typ}
+                     onChange={(e) => {
+                     handleChange(e);
+                    setSuchbegriff(e.target.value);
     }}
     style={{
         width: "100%",
