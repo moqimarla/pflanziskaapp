@@ -93,17 +93,17 @@ async function pflanzeAuswaehlen(pflanze) {
 
         const data = await response.json();
 
-        setForm({
-            typ: pflanze.common_name || 
-            pflanze.scientific_name?.[0] || "",
-            datum: "",
-            wasser: data.watering || "",
-            licht: data.sunlight?.join(", ") || "",
-            bild: data.default_image?.regular_url || ""
-        });
+    setForm(prev => ({
+    ...prev,
+    typ: pflanze.common_name ||
+         pflanze.scientific_name?.[0] || "",
+    wasser: data.watering || "",
+    licht: data.sunlight?.join(", ") || "",
+    bild: data.default_image?.regular_url || ""
+}));
 
-        setVorschlaege([]);
-        setSuchbegriff("");
+setVorschlaege([]);
+setSuchbegriff("");
 
     } catch (error) {
         console.error("Fehler beim Abrufen der Pflanzendetails:", error);
@@ -347,24 +347,44 @@ borderRadius: 14,
                     {/* die Inputs sind eigentlich alle nach dem gleichen Prinzip aufgebaut */}
                     <h2>{editId ? "Pflanze bearbeiten" : "Neue Pflanze"}</h2>
 
-                    {/* Suchfeld nur beim Erstellen einer neuen Pflanze anzeigen */}
-                    {!editId && form.name === "" && (
-                        <input
-                        placeholder="Pflanze suchen"
-                        value={suchbegriff}
-                        onChange={(e) => setSuchbegriff(e.target.value)}
-                        style={{
-                            width: "100%",        
-                            padding: "10px 12px", 
-                            marginBottom: 10, 
-                            borderRadius:10, 
-                            border: "1px solid #E8E8E8",
-                            boxSizing: "border-box",
-                             outline: "none",}}
-                        />
-                    )}
+                   
+                    <input
+                    name="name"
+                    placeholder="Name"
+                    value={form.name}
+                    onChange={handleChange}
+                
 
-                    {vorschlaege.map((pflanze) => (
+                    style={{width: "100%",        
+                        padding: "10px 12px", 
+                        marginBottom: 10, 
+                        borderRadius: 10, 
+                        border: "1px solid #E8E8E8",
+                        boxSizing: "border-box",
+                         outline: "none",
+        }}
+    />                
+                    <input
+    name="typ"
+    placeholder="Pflanzentyp suchen"
+    value={form.typ}
+    onChange={(e) => {
+        handleChange(e);
+        setSuchbegriff(e.target.value);
+    }}
+    style={{
+        width: "100%",
+        padding: "10px 12px",
+        marginBottom: 10,
+        borderRadius: 10,
+        border: "1px solid #E8E8E8",
+        boxSizing: "border-box",
+        outline: "none",
+    }}
+/>
+   
+
+ {vorschlaege.map((pflanze) => (
                         <div 
                             key={pflanze.id}
                             onClick={() => pflanzeAuswaehlen(pflanze)}
@@ -384,36 +404,6 @@ borderRadius: 14,
                     ))}
 
                     <input
-                    name="name"
-                    placeholder="Name"
-                    value={form.name}
-                    onChange={handleChange}
-                
-
-                    style={{width: "100%",        
-                        padding: "10px 12px", 
-                        marginBottom: 10, 
-                        borderRadius: 10, 
-                        border: "1px solid #E8E8E8",
-                        boxSizing: "border-box",
-                         outline: "none",
-        }}
-    />                
-                    <input
-                    name="typ"
-                    placeholder="Typ"
-                    value={form.typ}
-                    onChange={handleChange}
-                    style={{
-                        width: "100%",        
-                        padding: "10px 12px", 
-                        marginBottom: 10, 
-                        borderRadius:10, 
-                        border: "1px solid #E8E8E8",
-                        boxSizing: "border-box",
-                         outline: "none",}}
-                    />
-                    <input
                     name="datum"
                     type ="date"
                     value = {form.datum}
@@ -425,7 +415,9 @@ borderRadius: 14,
                         borderRadius:10, 
                         border: "1px solid #E8E8E8",
                         boxSizing: "border-box",
-                         outline: "none",}}
+                         outline: "none",
+backgroundColor: "white",
+color: "#333,"}}
                     />
                     
                     {fehler && <p style={{color: "red", fontSize: "12px", margin: "0 0 10px 0"}}>{fehler}</p>}
