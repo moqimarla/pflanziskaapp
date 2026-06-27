@@ -311,15 +311,21 @@ borderRadius: 14,
             setEditId(null);
             setOpen(true);
          }}
-         style = {{
-            position: "fixed",
-            bottom: 90,
-            right: 20,
-            width: 60,
-            height: 60,
-            fontSize: 30,
-            }}
-        >
+       
+        style={{
+          position: "fixed",
+          bottom: 90,
+          right: 20,
+          width: 60,
+          height: 60,
+        backgroundColor: "#8CAA08",
+          color: "white",
+          borderRadius: "50%",
+          border: "none",
+          fontSize: 25,
+          cursor: "pointer",
+        }}
+      >
             +
         </button>
 
