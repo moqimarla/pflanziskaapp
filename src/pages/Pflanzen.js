@@ -271,7 +271,7 @@ borderRadius: 14,
 
 
 
-                    <div style={{display: "flex", justifyContent: "space-between", marginTop: 10,}}>
+                   
                       <button
                             onClick={() => startEdit(pflanze)}
                             style={{
@@ -285,18 +285,8 @@ borderRadius: 14,
                         </button>
 
 
-                         <button
-                            onClick={() => pflanzeLoeschen(pflanze.id)}
-                            style={{
-                               background:"Transparent",
-                                border: "none",
-                                cursor: "pointer",
-                             
-                            }}
-                        >
-                            <FaTrash size={18} color="#E74C3C" />
-                        </button>
-                        </div>
+                    
+                    
                       </div>
 
                 </div>
@@ -353,7 +343,7 @@ borderRadius: 14,
                     {/* die Inputs sind eigentlich alle nach dem gleichen Prinzip aufgebaut */}
                     <h2>{editId ? "Pflanze bearbeiten" : "Neue Pflanze"}</h2>
 
-                   
+      
                     <input
                     name="name"
                     placeholder="Name"
@@ -424,13 +414,37 @@ borderRadius: 14,
                          outline: "none",
 backgroundColor: "white",
 color: "#333,"}}
-                    />
+/>
                     
                     {fehler && <p style={{color: "red", fontSize: "12px", margin: "0 0 10px 0"}}>{fehler}</p>}
 
+
+
+
                     <button onClick={() => { setOpen(false); setFehler(""); }}>Abbrechen</button>
                     <button onClick={PflanzeSpeichern} style={{marginRight: 10}}>{editId ? "Speichern" : "Hinzufügen"}</button>
-                </div>
+                 {editId && (
+    <button
+      onClick={() => {
+      pflanzeLoeschen(editId);
+        setOpen(false);
+      }}
+
+      style={{
+        background: "transparent",
+        border: "none",
+        cursor: "pointer",
+        padding: 4,
+marginLeft:"8em",
+
+      }}
+    >
+      <FaTrash size={20} color="#E74C3C" />
+    </button>
+
+  )}
+
+</div>
             </div>
         )}
           
