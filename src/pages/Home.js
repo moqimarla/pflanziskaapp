@@ -126,6 +126,7 @@ const todos = pflanzen.map((pflanze) => ({
 
   const gesamt = todos.length;
 
+
   const progress =
     gesamt === 0 ? 1 : erledigt / gesamt;
 

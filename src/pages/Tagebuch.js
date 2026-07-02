@@ -251,9 +251,11 @@ export default function Tagebuch() {
           right: 20,
           width: 60,
           height: 60,
+        backgroundColor: "#8CAA08",
+          color: "white",
           borderRadius: "50%",
           border: "none",
-          fontSize: 30,
+          fontSize: 25,
           cursor: "pointer",
         }}
       >

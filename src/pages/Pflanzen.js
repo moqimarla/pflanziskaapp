@@ -8,12 +8,8 @@ export default function Pflanzen () {
     const [pflanzen, setPflanzen] = useState(() => {
         const saved = localStorage.getItem("pflanzen");
         return saved ? JSON.parse(saved) : [];
-    });
 
-    const [tagebuch] = useState(() => {
-        const saved = localStorage.getItem("tagebuch");
-        return saved ? JSON.parse(saved) : [];
-    });
+ });
 
  // NEU: Den Notification-Hook aktivieren
  const { addNotification } = useNotifications();
@@ -97,17 +93,17 @@ async function pflanzeAuswaehlen(pflanze) {
 
         const data = await response.json();
 
-        setForm({
-            typ: pflanze.common_name || 
-            pflanze.scientific_name?.[0] || "",
-            datum: "",
-            wasser: data.watering || "",
-            licht: data.sunlight?.join(", ") || "",
-            bild: data.default_image?.regular_url || ""
-        });
+    setForm(prev => ({
+    ...prev,
+    typ: pflanze.common_name ||
+         pflanze.scientific_name?.[0] || "",
+    wasser: data.watering || "",
+    licht: data.sunlight?.join(", ") || "",
+    bild: data.default_image?.regular_url || ""
+}));
 
-        setVorschlaege([]);
-        setSuchbegriff("");
+setVorschlaege([]);
+setSuchbegriff("");
 
     } catch (error) {
         console.error("Fehler beim Abrufen der Pflanzendetails:", error);
@@ -123,7 +119,7 @@ function WaterIcon({ level }) {
     return (
         <span style={{ display: "flex", gap: 2 }}>
             {Array.from({ length: count }).map((_, i) => (
-                <FaTint key={i} color="#3498DB" />
+                <FaTint key={i} color="#3498DB" size = {24} />
             ))}
         </span>
     );
@@ -138,7 +134,7 @@ function SunIcon({ level }) {
     return (
         <span style={{ display: "flex", gap: 2 }}>
             {Array.from({ length: count }).map((_, i) => (
-                <FaSun key={i} color="#F1C40F" />
+                <FaSun key={i} color="#F1C40F" size = {24} />
             ))}
         </span>
     );
@@ -213,18 +209,6 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
     addNotification("Pflanze entfernt 🗑️", `"${nameFürNotification}" wurde aus deiner Sammlung gelöscht.`, "error");
 }
 
-function getAktuellesTagebuchBild(pflanzenId) {
-  const eintraegeMitBild = tagebuch
-    .filter(
-      (eintrag) =>
-        Number(eintrag.pflanzenId) === Number(pflanzenId) &&
-        eintrag.bild
-    )
-    .sort((a, b) => new Date(b.datum) - new Date(a.datum));
-
-  return eintraegeMitBild.length > 0 ? eintraegeMitBild[0].bild : null;
-}
-
  //ab hier nur noch styling, keine Funktion perse und: JSX, also Kommentare anders schreiben
 
     return (
@@ -232,39 +216,62 @@ function getAktuellesTagebuchBild(pflanzenId) {
         <div style = {{padding:20, backgroundColor: "#F4FAF4", minHeight: "100vh"}}>      {/* hier muss noch iwann der username rein */}  
             <h1>Meine Pflanzen</h1>
             {/*Liste  */}
-            {pflanzen.map((pflanze) => {
-                const titelbild = getAktuellesTagebuchBild(pflanze.id) || pflanze.bild;
-
-                return (
-                    <div key={pflanze.id} style={{
+<div style = {{
+display: "grid",
+gridTemplateColumns: "repeat(2,1fr)",
+gap: 16,}}>
+            {pflanzen.map((pflanze) => (
+                
+                    <div key={pflanze.id} 
+                    style={{
                     backgroundColor: "white", 
-                    borderRadius: 14,
+                    borderRadius: 18,
                     padding: 16,
                     marginBottom: 14,
                     boxShadow: "0px 4px 12px rgba(0,0,0,0.05)",
                     border: "1px solid #E8E8E8",
 
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
+                    flexDirection: "column",
+                    alignItems: "center",
                     gap: 14,
                   }}>
-                    <div style={{flex: 1, display: "flex", flexDirection: "column", gap: 4}}>
-                    <h2 style ={{margin: 0, fontSize: 18}}>
-                        {pflanze.name}
-                        </h2>
-                    <p style = {{margin: 0, color: "#555", fontSize: 14}}>Typ: {pflanze.typ}</p>
-                    <p>Datum: {pflanze.datum}</p>
+
+
+{/*Bild*/}
+<img
+  src={pflanze.bild || "/assets/mascot/pflanziska/mood-4-happy.png"}
+  alt={pflanze.name}
+  style={{
+    width: "100%",
+    height: 160,
+    objectFit: "cover",
+borderRadius: 14,
+
+  }}
+  onError={(e) => {
+    e.target.onerror = null;
+    e.target.src =  "/assets/mascot/pflanziska/mood-4-happy.png";
+  }}
+/>     
+
+
+
+                    <div style={{padding: 12, textAlign:"center"}}>
+
+                    <h2 style ={{margin: 0, fontSize: 18}}> {pflanze.name} </h2>
+                    <p style = {{margin: 3, color: "#555", fontSize: 14}}> {pflanze.typ}</p>
+                    <p style = {{margin: 3, color: "#555", fontSize: 14}}> {pflanze.datum}</p>
                     
                {/*kleine Icons für Wasser und Sonne*/}     
-                    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                    <div style={{ display: "flex", gap: 10, justifyContent: "center", margin: 10 }}>
                     <WaterIcon level={pflanze.wasser} />
                     <SunIcon level={pflanze.licht} />
                     </div>
 
 
 
-                    <div style={{display: "flex", gap: 10, marginTop: 10}}>
+                   
                       <button
                             onClick={() => startEdit(pflanze)}
                             style={{
@@ -274,53 +281,17 @@ function getAktuellesTagebuchBild(pflanzenId) {
                                 padding: 6,
                             }}
                         >
-                            <FaPen size={24} color="#8CB300" />
+                            <FaPen size={18} color="#8CB300" />
                         </button>
 
 
-                         <button
-                            onClick={() => pflanzeLoeschen(pflanze.id)}
-                            style={{
-                               background:"Transparent",
-                                border: "none",
-                                cursor: "pointer",
-                                padding: 6,
-                            }}
-                        >
-                            <FaTrash size={24} color="#E74C3C" />
-                        </button>
-                        </div>
-                        </div>
                     
                     
+                      </div>
 
-
-
-                    {titelbild && (
-                        <img 
-                            src={titelbild}
-                            alt={pflanze.name}
-                            style={{
-                            width: 110,
-                            height: 110,
-                            objectFit: "cover",
-                            borderRadius: 12,
-                            marginTop: 10,
-                            flexShrink: 0,
-                            }}
-                        />
-                    )}
-                    <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-    
-                     
-
-                   
-
-                    </div>
                 </div>
-                );
-        })}
-
+))}
+</div>
        {/* Button */}
        <button 
          onClick={() => {
@@ -330,15 +301,21 @@ function getAktuellesTagebuchBild(pflanzenId) {
             setEditId(null);
             setOpen(true);
          }}
-         style = {{
-            position: "fixed",
-            bottom: 90,
-            right: 20,
-            width: 60,
-            height: 60,
-            fontSize: 30,
-            }}
-        >
+       
+        style={{
+          position: "fixed",
+          bottom: 90,
+          right: 20,
+          width: 60,
+          height: 60,
+        backgroundColor: "#8CAA08",
+          color: "white",
+          borderRadius: "50%",
+          border: "none",
+          fontSize: 25,
+          cursor: "pointer",
+        }}
+      >
             +
         </button>
 
@@ -366,24 +343,44 @@ function getAktuellesTagebuchBild(pflanzenId) {
                     {/* die Inputs sind eigentlich alle nach dem gleichen Prinzip aufgebaut */}
                     <h2>{editId ? "Pflanze bearbeiten" : "Neue Pflanze"}</h2>
 
-                    {/* Suchfeld nur beim Erstellen einer neuen Pflanze anzeigen */}
-                    {!editId && form.name === "" && (
-                        <input
-                        placeholder="Pflanze suchen"
-                        value={suchbegriff}
-                        onChange={(e) => setSuchbegriff(e.target.value)}
-                        style={{
-                            width: "100%",        
-                            padding: "10px 12px", 
-                            marginBottom: 10, 
-                            borderRadius:10, 
-                            border: "1px solid #E8E8E8",
-                            boxSizing: "border-box",
-                             outline: "none",}}
-                        />
-                    )}
+      
+                    <input
+                    name="name"
+                    placeholder="Name"
+                    value={form.name}
+                    onChange={handleChange}
+                
 
-                    {vorschlaege.map((pflanze) => (
+                    style={{width: "100%",        
+                        padding: "10px 12px", 
+                        marginBottom: 10, 
+                        borderRadius: 10, 
+                        border: "1px solid #E8E8E8",
+                        boxSizing: "border-box",
+                         outline: "none",
+        }}
+    />                
+                    <input
+                    name="typ"
+                     placeholder="Pflanzentyp suchen"
+                    value={form.typ}
+                     onChange={(e) => {
+                     handleChange(e);
+                    setSuchbegriff(e.target.value);
+    }}
+    style={{
+        width: "100%",
+        padding: "10px 12px",
+        marginBottom: 10,
+        borderRadius: 10,
+        border: "1px solid #E8E8E8",
+        boxSizing: "border-box",
+        outline: "none",
+    }}
+/>
+   
+
+ {vorschlaege.map((pflanze) => (
                         <div 
                             key={pflanze.id}
                             onClick={() => pflanzeAuswaehlen(pflanze)}
@@ -403,36 +400,6 @@ function getAktuellesTagebuchBild(pflanzenId) {
                     ))}
 
                     <input
-                    name="name"
-                    placeholder="Name"
-                    value={form.name}
-                    onChange={handleChange}
-                
-
-                    style={{width: "100%",        
-                        padding: "10px 12px", 
-                        marginBottom: 10, 
-                        borderRadius: 10, 
-                        border: "1px solid #E8E8E8",
-                        boxSizing: "border-box",
-                         outline: "none",
-        }}
-    />                
-                    <input
-                    name="typ"
-                    placeholder="Typ"
-                    value={form.typ}
-                    onChange={handleChange}
-                    style={{
-                        width: "100%",        
-                        padding: "10px 12px", 
-                        marginBottom: 10, 
-                        borderRadius:10, 
-                        border: "1px solid #E8E8E8",
-                        boxSizing: "border-box",
-                         outline: "none",}}
-                    />
-                    <input
                     name="datum"
                     type ="date"
                     value = {form.datum}
@@ -444,14 +411,40 @@ function getAktuellesTagebuchBild(pflanzenId) {
                         borderRadius:10, 
                         border: "1px solid #E8E8E8",
                         boxSizing: "border-box",
-                         outline: "none",}}
-                    />
+                         outline: "none",
+backgroundColor: "white",
+color: "#333,"}}
+/>
                     
                     {fehler && <p style={{color: "red", fontSize: "12px", margin: "0 0 10px 0"}}>{fehler}</p>}
 
+
+
+
                     <button onClick={() => { setOpen(false); setFehler(""); }}>Abbrechen</button>
                     <button onClick={PflanzeSpeichern} style={{marginRight: 10}}>{editId ? "Speichern" : "Hinzufügen"}</button>
-                </div>
+                 {editId && (
+    <button
+      onClick={() => {
+      pflanzeLoeschen(editId);
+        setOpen(false);
+      }}
+
+      style={{
+        background: "transparent",
+        border: "none",
+        cursor: "pointer",
+        padding: 4,
+marginLeft:"8em",
+
+      }}
+    >
+      <FaTrash size={20} color="#E74C3C" />
+    </button>
+
+  )}
+
+</div>
             </div>
         )}
           
