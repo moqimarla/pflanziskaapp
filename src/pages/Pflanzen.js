@@ -8,8 +8,12 @@ export default function Pflanzen () {
     const [pflanzen, setPflanzen] = useState(() => {
         const saved = localStorage.getItem("pflanzen");
         return saved ? JSON.parse(saved) : [];
+    });
 
- });
+    const [tagebuch] = useState(() => {
+        const saved = localStorage.getItem("tagebuch");
+        return saved ? JSON.parse(saved) : [];
+    });
 
  // NEU: Den Notification-Hook aktivieren
  const { addNotification } = useNotifications();
@@ -209,6 +213,18 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
     addNotification("Pflanze entfernt 🗑️", `"${nameFürNotification}" wurde aus deiner Sammlung gelöscht.`, "error");
 }
 
+function getAktuellesTagebuchBild(pflanzenId) {
+  const eintraegeMitBild = tagebuch
+    .filter(
+      (eintrag) =>
+        Number(eintrag.pflanzenId) === Number(pflanzenId) &&
+        eintrag.bild
+    )
+    .sort((a, b) => new Date(b.datum) - new Date(a.datum));
+
+  return eintraegeMitBild.length > 0 ? eintraegeMitBild[0].bild : null;
+}
+
  //ab hier nur noch styling, keine Funktion perse und: JSX, also Kommentare anders schreiben
 
     return (
@@ -216,8 +232,11 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
         <div style = {{padding:20, backgroundColor: "#F4FAF4", minHeight: "100vh"}}>      {/* hier muss noch iwann der username rein */}  
             <h1>Meine Pflanzen</h1>
             {/*Liste  */}
-            {pflanzen.map((pflanze) => (
-                <div key={pflanze.id} style={{
+            {pflanzen.map((pflanze) => {
+                const titelbild = getAktuellesTagebuchBild(pflanze.id) || pflanze.bild;
+
+                return (
+                    <div key={pflanze.id} style={{
                     backgroundColor: "white", 
                     borderRadius: 14,
                     padding: 16,
@@ -277,13 +296,20 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
 
 
 
-                    {pflanze.bild && (
-                    <img 
-                         src={pflanze.bild}
-                         alt={pflanze.name}
-                          style={{ width: "20%", height: "20%", objectFit: "cover", borderRadius: 10, marginTop: 10 }}
+                    {titelbild && (
+                        <img 
+                            src={titelbild}
+                            alt={pflanze.name}
+                            style={{
+                            width: 110,
+                            height: 110,
+                            objectFit: "cover",
+                            borderRadius: 12,
+                            marginTop: 10,
+                            flexShrink: 0,
+                            }}
                         />
-)}
+                    )}
                     <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
     
                      
@@ -292,7 +318,8 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
 
                     </div>
                 </div>
-            ))}
+                );
+        })}
 
        {/* Button */}
        <button 

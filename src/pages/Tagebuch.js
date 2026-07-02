@@ -110,21 +110,37 @@ export default function Tagebuch() {
   }
 
   function handleBildChange(e) {
-      const file = e.target.files[0];
+  const file = e.target.files[0];
 
-      if (!file) return;
+  if (!file) return;
 
-      const reader = new FileReader();
+  const reader = new FileReader();
 
-      reader.onloadend = () => {
-          setForm(prev => ({
-              ...prev,
-              bild: reader.result,
-          }));
-      };
+  reader.onloadend = () => {
+    setForm(prev => ({
+      ...prev,
+      bild: reader.result,
+    }));
+  };
 
-      reader.readAsDataURL(file);
-  }
+  reader.readAsDataURL(file);
+
+  e.target.value = "";
+}
+
+  const bildButtonStyle = {
+  display: "block",
+  width: "100%",
+  padding: "10px 12px",
+  marginBottom: 10,
+  borderRadius: 10,
+  border: "1px solid #8CB300",
+  backgroundColor: "white",
+  color: "#4F6F00",
+  textAlign: "center",
+  cursor: "pointer",
+  boxSizing: "border-box",
+};
 
 
 
@@ -333,16 +349,53 @@ export default function Tagebuch() {
               }}
             />
 
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleBildChange}
-            />
+            <label style={bildButtonStyle}>
+              Bild aus Galerie auswählen
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleBildChange}
+                style={{ display: "none" }}
+              />
+            </label>
+
+            <label style={bildButtonStyle}>
+              Foto aufnehmen
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleBildChange}
+                style={{ display: "none" }}
+              />
+            </label>
+
+            {form.bild && (
+              <img
+                src={form.bild}
+                alt="Vorschau"
+                style={{
+                  width: "min(240px, 100%)",
+                  height: 240,
+                  objectFit: "cover",
+                  borderRadius: 12,
+                  flexShrink: 0,
+                }}
+              />
+            )}
 
             <div
               style={{
+                backgroundColor: "white",
+                borderRadius: 14,
+                padding: 16,
+                marginBottom: 12,
+                boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
+                border: "1px solid #E8E8E8",
                 display: "flex",
                 justifyContent: "space-between",
+                gap: 16,
+                flexWrap: "wrap",
               }}
             >
               <button onClick={popupSchliessen}>
