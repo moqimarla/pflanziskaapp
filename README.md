@@ -1,4 +1,5 @@
 # Updates
+02.07 Marla -> Pflanzenseite: Löschen Button ist jetzt im Bearbeitungsmodus versteckt. 
 27.06 Marla -> Plus Buttons bei Pflanzen und Tagebuch Seite sehen jetzt gleich aus
 26.06 Marla -> Pflanzen hinzufügen ist logischer strukturiert, erst Name, dann Typ suchen, dann Datum. Datepicker verschönert.
 24.06 Marla -> Pflanzenseite verschönert, Karten sehen jetzt besser aus. Werde die Lösch/Bearbeiten Buttons nochmal anpassen.
