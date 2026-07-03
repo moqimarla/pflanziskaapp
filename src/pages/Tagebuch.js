@@ -48,7 +48,7 @@ export default function Tagebuch() {
       );
       setEditId(null);
 
-      addNotification("Eintrag aktualisiert 📝", `Die Änderungen an "${form.datum, form.pflanzenId}" wurden gespeichert.`, "info");
+      addNotification("Eintrag aktualisiert 📝", `Die Änderungen an "${form.datum}, ${form.pflanzenId}" wurden gespeichert.`, "info");
     } else {
       setTagebuch([
         ...tagebuch,
@@ -57,7 +57,7 @@ export default function Tagebuch() {
           ...form,
         },
       ]);
-      addNotification("Tagebucheintrag hinzugefügt! 🌱", `"${form.datum}" wurde erfolgreich zu deinem Tagebuch hinzugefügt.`, "success");
+      addNotification("Tagebucheintrag hinzugefügt! 🌱", `"${form.datum}, ${form.pflanzenId}" wurde erfolgreich zu deinem Tagebuch hinzugefügt.`, "success");
     }
 
     setForm({
@@ -110,26 +110,50 @@ export default function Tagebuch() {
   }
 
   function handleBildChange(e) {
-      const file = e.target.files[0];
+    const file = e.target.files[0];
 
-      if (!file) return;
+    if (!file) return;
 
-      const reader = new FileReader();
+    const reader = new FileReader();
 
-      reader.onloadend = () => {
-          setForm(prev => ({
-              ...prev,
-              bild: reader.result,
-          }));
-      };
+    reader.onloadend = () => {
+      setForm(prev => ({
+        ...prev,
+        bild: reader.result,
+      }));
+    };
 
-      reader.readAsDataURL(file);
+    reader.readAsDataURL(file);
+
+    e.target.value = "";
   }
 
+  const bildButtonStyle = {
+    display: "block",
+    width: "100%",
+    padding: "10px 12px",
+    marginBottom: 10,
+    borderRadius: 10,
+    border: "1px solid #8CB300",
+    backgroundColor: "white",
+    color: "#4F6F00",
+    textAlign: "center",
+    cursor: "pointer",
+    boxSizing: "border-box",
+  };
 
-
-
-
+  const popupButtonStyle = {
+    flex: 1,
+    padding: "10px 12px",
+    borderRadius: 10,
+    border: "1px solid #8CB300",
+    backgroundColor: "white",
+    color: "#4F6F00",
+    textAlign: "center",
+    cursor: "pointer",
+    boxSizing: "border-box",
+    fontSize: 14,
+  };
 
   return (
     <div
@@ -145,13 +169,16 @@ export default function Tagebuch() {
         <p>Noch keine Einträge vorhanden.</p>
       )}
 
-      {tagebuch.map((eintrag) => {
+      {[...tagebuch]
+      .sort((a, b) => new Date(b.datum) - new Date(a.datum))
+      .map((eintrag) => {
         const pflanze = pflanzen.find(
-            p => p.id === Number(eintrag.pflanzenId)
+          p => p.id === Number(eintrag.pflanzenId)
         );
 
         return (
-          <div
+          //Tagebucheinträge in einer flexiblen Box mit Bild rechts und Text links darstellen
+          <div 
             key={eintrag.id}
             style={{
               backgroundColor: "white",
@@ -162,7 +189,9 @@ export default function Tagebuch() {
               border: "1px solid #E8E8E8",
               display: "flex",
               justifyContent: "space-between",
+              alignItems: "flex-start",
               gap: 16,
+              flexWrap: "wrap",
             }}
           >
             <div style={{ flex: 1 }}>
@@ -209,20 +238,28 @@ export default function Tagebuch() {
                 </button>
               </div>
             </div>
-
-            {eintrag.bild && (
-              <img
-                src={eintrag.bild}
-                alt=""
-                style={{
-                  width: 240,
-                  height: 240,
-                  objectFit: "cover",
-                  borderRadius: 12,
-                  flexShrink: 0,
-                }}
-              />
-            )}
+            
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "flex-start",
+                flexShrink: 0,
+              }}
+            >
+              {eintrag.bild && (
+                <img
+                  src={eintrag.bild}
+                  alt=""
+                  style={{
+                    width: "min(240px, 100%)",
+                    height: 240,
+                    objectFit: "cover",
+                    borderRadius: 12,
+                  }}
+                />
+              )}
+            </div>
           </div>
         );
       })}
@@ -335,23 +372,61 @@ export default function Tagebuch() {
               }}
             />
 
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleBildChange}
-            />
+            <label style={bildButtonStyle}>
+              Bild aus Galerie auswählen
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleBildChange}
+                style={{ display: "none" }}
+              />
+            </label>
+
+            <label style={bildButtonStyle}>
+              Foto aufnehmen
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleBildChange}
+                style={{ display: "none" }}
+              />
+            </label>
+
+            {form.bild && (
+              <img
+                src={form.bild}
+                alt="Vorschau"
+                style={{
+                  width: "100%",
+                  height: 180,
+                  objectFit: "cover",
+                  borderRadius: 12,
+                  marginBottom: 15,
+                }}
+              />
+            )}
 
             <div
               style={{
                 display: "flex",
-                justifyContent: "space-between",
+                gap: 10,
+                marginTop: 5,
               }}
             >
-              <button onClick={popupSchliessen}>
+              <button onClick={popupSchliessen}
+                      style={popupButtonStyle}>
                 Abbrechen
               </button>
 
-              <button onClick={TagebuchSpeichern}>
+              <button 
+                onClick={TagebuchSpeichern} 
+                style={{
+                  ...popupButtonStyle,
+                  backgroundColor: "#8CB300",
+                  color: "white",
+                }}
+              >
                 {editId ? "Speichern" : "Hinzufügen"}
               </button>
             </div>

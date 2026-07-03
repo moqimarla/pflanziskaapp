@@ -8,8 +8,12 @@ export default function Pflanzen () {
     const [pflanzen, setPflanzen] = useState(() => {
         const saved = localStorage.getItem("pflanzen");
         return saved ? JSON.parse(saved) : [];
+    });
 
- });
+    const [tagebuch] = useState(() => {
+        const saved = localStorage.getItem("tagebuch");
+        return saved ? JSON.parse(saved) : [];
+    });
 
  // NEU: Den Notification-Hook aktivieren
  const { addNotification } = useNotifications();
@@ -209,6 +213,19 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
     addNotification("Pflanze entfernt 🗑️", `"${nameFürNotification}" wurde aus deiner Sammlung gelöscht.`, "error");
 }
 
+// Funktion, um das aktuellste Tagebuchbild für eine Pflanze zu bekommen
+function getAktuellesTagebuchBild(pflanzenId) {
+  const eintraegeMitBild = tagebuch
+    .filter(
+      (eintrag) =>
+        Number(eintrag.pflanzenId) === Number(pflanzenId) &&
+        eintrag.bild
+    )
+    .sort((a, b) => new Date(b.datum) - new Date(a.datum));
+
+  return eintraegeMitBild.length > 0 ? eintraegeMitBild[0].bild : null;
+}
+
  //ab hier nur noch styling, keine Funktion perse und: JSX, also Kommentare anders schreiben
 
     return (
@@ -216,14 +233,17 @@ console.log(process.env.REACT_APP_PERENUAL_KEY);
         <div style = {{padding:20, backgroundColor: "#F4FAF4", minHeight: "100vh"}}>      {/* hier muss noch iwann der username rein */}  
             <h1>Meine Pflanzen</h1>
             {/*Liste  */}
-<div style = {{
-display: "grid",
-gridTemplateColumns: "repeat(2,1fr)",
-gap: 16,}}>
-            {pflanzen.map((pflanze) => (
-                
-                    <div key={pflanze.id} 
-                    style={{
+            <div style = {{
+            display: "grid",
+            gridTemplateColumns: "repeat(2,1fr)",
+            gap: 16,}}>
+
+            {pflanzen.map((pflanze) => {
+                const titelbild = getAktuellesTagebuchBild(pflanze.id) || pflanze.bild;
+
+            return (
+                <div key={pflanze.id} 
+                style={{
                     backgroundColor: "white", 
                     borderRadius: 18,
                     padding: 16,
@@ -235,25 +255,25 @@ gap: 16,}}>
                     flexDirection: "column",
                     alignItems: "center",
                     gap: 14,
-                  }}>
+                }}>
 
 
-{/*Bild*/}
-<img
-  src={pflanze.bild || "/assets/mascot/pflanziska/mood-4-happy.png"}
-  alt={pflanze.name}
-  style={{
-    width: "100%",
-    height: 160,
-    objectFit: "cover",
-borderRadius: 14,
+                {/*Bild*/}
+                    <img
+                    src={titelbild || "/assets/mascot/pflanziska/mood-4-happy.png"}
+                    alt={pflanze.name}
+                    style={{
+                        width: "100%",
+                        height: 160,
+                        objectFit: "cover",
+                    borderRadius: 14,
 
-  }}
-  onError={(e) => {
-    e.target.onerror = null;
-    e.target.src =  "/assets/mascot/pflanziska/mood-4-happy.png";
-  }}
-/>     
+                    }}
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src =  "/assets/mascot/pflanziska/mood-4-happy.png";
+                    }}
+                    />     
 
 
 
@@ -290,7 +310,9 @@ borderRadius: 14,
                       </div>
 
                 </div>
-))}
+            );
+        })}
+
 </div>
        {/* Button */}
        <button 
