@@ -30,6 +30,8 @@ export default function Tagebuch() {
 
   const [editId, setEditId] = useState(null);
 
+  const [ausgewaehltePflanzeId, setAusgewaehltePflanzeId] = useState(null);
+
   function handleChange(e) {
     setForm({
       ...form,
@@ -155,6 +157,25 @@ export default function Tagebuch() {
     fontSize: 14,
   };
 
+  function getEintraegeNachPflanze(pflanzenId) {
+    return tagebuch
+      .filter((eintrag) => Number(eintrag.pflanzenId) === Number(pflanzenId))
+      .sort((a, b) => new Date(b.datum) - new Date(a.datum));
+  }
+
+  const pflanzenMitEintraegen = pflanzen.filter(
+    (pflanze) => getEintraegeNachPflanze(pflanze.id).length > 0
+  );
+
+  useEffect(() => {
+    if (!ausgewaehltePflanzeId && pflanzenMitEintraegen.length > 0) {
+      setAusgewaehltePflanzeId(pflanzenMitEintraegen[0].id);
+    }
+  }, [pflanzenMitEintraegen, ausgewaehltePflanzeId]);
+
+
+
+
   return (
     <div
       style={{
@@ -165,104 +186,153 @@ export default function Tagebuch() {
     >
       <h1>Mein Pflanzentagebuch</h1>
 
+      {pflanzenMitEintraegen.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            gap: 10,
+            overflowX: "auto",
+            paddingBottom: 10,
+            marginBottom: 20,
+          }}
+        >
+          {pflanzenMitEintraegen.map((pflanze) => (
+            <button
+              key={pflanze.id}
+              onClick={() => setAusgewaehltePflanzeId(pflanze.id)}
+              style={{
+                padding: "10px 14px",
+                borderRadius: 999,
+                border: "1px solid #8CB300",
+                backgroundColor:
+                  ausgewaehltePflanzeId === pflanze.id ? "#8CB300" : "white",
+                color:
+                  ausgewaehltePflanzeId === pflanze.id ? "white" : "#4F6F00",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                fontSize: 14,
+              }}
+            >
+              {pflanze.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       {tagebuch.length === 0 && (
         <p>Noch keine Einträge vorhanden.</p>
       )}
 
-      {[...tagebuch]
-      .sort((a, b) => new Date(b.datum) - new Date(a.datum))
-      .map((eintrag) => {
-        const pflanze = pflanzen.find(
-          p => p.id === Number(eintrag.pflanzenId)
-        );
+      {ausgewaehltePflanzeId ? (
+        (() => {
+          const pflanze = pflanzen.find(
+            (p) => p.id === Number(ausgewaehltePflanzeId)
+          );
 
-        return (
-          //Tagebucheinträge in einer flexiblen Box mit Bild rechts und Text links darstellen
-          <div 
-            key={eintrag.id}
-            style={{
-              backgroundColor: "white",
-              borderRadius: 14,
-              padding: 16,
-              marginBottom: 12,
-              boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
-              border: "1px solid #E8E8E8",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              gap: 16,
-              flexWrap: "wrap",
-            }}
-          >
-            <div style={{ flex: 1 }}>
-              <h2>{eintrag.datum}</h2>
+          const eintraegeDerPflanze = getEintraegeNachPflanze(ausgewaehltePflanzeId);
 
-              <p
+          if (!pflanze) return null;
+
+          return (
+            <div style={{ marginBottom: 30 }}>
+              <h2
                 style={{
-                  color: "#777",
-                  fontSize: 14,
+                  marginTop: 25,
+                  marginBottom: 12,
+                  color: "#4F6F00",
+                  borderBottom: "2px solid #DDEECC",
+                  paddingBottom: 6,
                 }}
               >
-                {pflanze?.name}
-              </p>
+                {pflanze.name}
+              </h2>
 
-              <p>
-                {eintrag.eintrag.length > 100 
-                  ? eintrag.eintrag.substring(0, 100) + '...' 
-                  : eintrag.eintrag}
-              </p>
-
-              <div style={{display: "flex", gap: 10, marginTop: 10}}>
-                <button
-                  onClick={() => startEdit(eintrag)}
+              {eintraegeDerPflanze.map((eintrag) => (
+                <div
+                  key={eintrag.id}
                   style={{
-                    background:"Transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 6,
+                    backgroundColor: "white",
+                    borderRadius: 14,
+                    padding: 16,
+                    marginBottom: 12,
+                    boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
+                    border: "1px solid #E8E8E8",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    gap: 16,
+                    flexWrap: "wrap",
                   }}
                 >
-                  <FaPen size={24} color="#8CB300" />
-                </button>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ marginTop: 0 }}>
+                      {eintrag.datum}
+                    </h3>
 
-                <button
-                  onClick={() => tagebuchLoeschen(eintrag.id)}
-                  style={{
-                    background:"Transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 6,
-                  }}
-                >
-                  <FaTrash size={24} color="#E74C3C" />
-                </button>
-              </div>
+                    <p>
+                      {eintrag.eintrag.length > 100
+                        ? eintrag.eintrag.substring(0, 100) + "..."
+                        : eintrag.eintrag}
+                    </p>
+
+                    <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                      <button
+                        onClick={() => startEdit(eintrag)}
+                        style={{
+                          background: "transparent",
+                          border: "none",
+                          cursor: "pointer",
+                          padding: 6,
+                        }}
+                      >
+                        <FaPen size={24} color="#8CB300" />
+                      </button>
+
+                      <button
+                        onClick={() => tagebuchLoeschen(eintrag.id)}
+                        style={{
+                          background: "transparent",
+                          border: "none",
+                          cursor: "pointer",
+                          padding: 6,
+                        }}
+                      >
+                        <FaTrash size={24} color="#E74C3C" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {eintrag.bild && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        alignItems: "flex-start",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <img
+                        src={eintrag.bild}
+                        alt=""
+                        style={{
+                          width: "min(240px, 100%)",
+                          height: 240,
+                          objectFit: "cover",
+                          borderRadius: 12,
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-            
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "flex-start",
-                flexShrink: 0,
-              }}
-            >
-              {eintrag.bild && (
-                <img
-                  src={eintrag.bild}
-                  alt=""
-                  style={{
-                    width: "min(240px, 100%)",
-                    height: 240,
-                    objectFit: "cover",
-                    borderRadius: 12,
-                  }}
-                />
-              )}
-            </div>
-          </div>
-        );
-      })}
+          );
+        })()
+      ) : (
+        <p style={{ color: "#777" }}>
+          Wähle oben eine Pflanze aus, um ihre Tagebucheinträge zu sehen.
+        </p>
+      )}
 
       <button
         onClick={() => setOpen(true)}
