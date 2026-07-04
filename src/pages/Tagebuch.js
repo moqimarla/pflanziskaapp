@@ -9,8 +9,14 @@ export default function Tagebuch() {
   });
 
   useEffect(() => {
-    localStorage.setItem("tagebuch", JSON.stringify(tagebuch));
-  }, [tagebuch]);
+      try {
+        localStorage.setItem("tagebuch", JSON.stringify(tagebuch));
+      } catch (error) {
+        console.error("Speicherplatz voll:", error);
+        alert("Der Speicher ist voll. Bitte verwende kleinere Bilder oder lösche alte Einträge.");
+      }
+    }, [tagebuch]
+  );
 
   const [open, setOpen] = useState(false);
 
@@ -111,19 +117,18 @@ export default function Tagebuch() {
     });
   }
 
-  function handleBildChange(e) {
+  const handleBildChange = async (e) => {
     const file = e.target.files[0];
 
     if (!file) return;
 
-    const reader = new FileReader();
+    const kleinesBild = await resizeImage(file);
 
-    reader.onloadend = () => {
-      setForm(prev => ({
-        ...prev,
-        bild: reader.result,
-      }));
-    };
+    setForm({
+      ...form,
+      bild: kleinesBild,
+    });
+  };
 
     reader.readAsDataURL(file);
 
@@ -173,6 +178,33 @@ export default function Tagebuch() {
     }
   }, [pflanzenMitEintraegen, ausgewaehltePflanzeId]);
 
+  function resizeImage(file, maxWidth = 600, quality = 0.7) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const img = new Image();
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+
+        const scale = maxWidth / img.width;
+        canvas.width = maxWidth;
+        canvas.height = img.height * scale;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const resizedBase64 = canvas.toDataURL("image/jpeg", quality);
+        resolve(resizedBase64);
+      };
+
+      img.src = event.target.result;
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
 
 
 
@@ -443,23 +475,11 @@ export default function Tagebuch() {
             />
 
             <label style={bildButtonStyle}>
-              Bild aus Galerie auswählen
+              Bild hinzufügen
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleBildChange}
-                style={{ display: "none" }}
-              />
-            </label>
-
-            <label style={bildButtonStyle}>
-              Foto aufnehmen
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={handleBildChange}
-                style={{ display: "none" }}
               />
             </label>
 
