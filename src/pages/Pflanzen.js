@@ -109,7 +109,7 @@ export default function Pflanzen () {
 
         try {
             const response = await fetch(
-                `https://perenual.com{process.env.REACT_APP_PERENUAL_KEY}&q=${text}`
+                `https://perenual.com/api/v2/species-list?key=${process.env.REACT_APP_PERENUAL_KEY}&q=${text}`
             );
             const data = await response.json();
             setVorschlaege((data.data || []).slice(0, 4));
@@ -122,7 +122,7 @@ export default function Pflanzen () {
     async function pflanzeAuswaehlen(pflanze) {
         try {
             const response = await fetch(
-                `https://perenual.com{pflanze.id}?key=${process.env.REACT_APP_PERENUAL_KEY}`
+        `https://perenual.com/api/v2/species/details/${pflanze.id}?key=${process.env.REACT_APP_PERENUAL_KEY}`
             );
             const data = await response.json();
 
