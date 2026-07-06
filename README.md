@@ -1,4 +1,5 @@
 # Updates
+06.07 Marla -> API war kaputt, geht jetzt wieder
 02.07 Marla -> Pflanzenseite: Löschen Button ist jetzt im Bearbeitungsmodus versteckt. 
 27.06 Marla -> Plus Buttons bei Pflanzen und Tagebuch Seite sehen jetzt gleich aus
 26.06 Marla -> Pflanzen hinzufügen ist logischer strukturiert, erst Name, dann Typ suchen, dann Datum. Datepicker verschönert.
