@@ -119,7 +119,6 @@ export default function Tagebuch() {
 
   const handleBildChange = async (e) => {
     const file = e.target.files[0];
-
     if (!file) return;
 
     const kleinesBild = await resizeImage(file);
@@ -128,12 +127,9 @@ export default function Tagebuch() {
       ...form,
       bild: kleinesBild,
     });
-  };
-
-    reader.readAsDataURL(file);
-
+    
     e.target.value = "";
-  }
+  };
 
   const bildButtonStyle = {
     display: "block",
