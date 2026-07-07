@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import PlantMascotWidget from "../Komponents/PlantMascotWidget";
+import { useState, useEffect, useCallback } from "react";
+//import PlantMascotWidget from "../Komponents/PlantMascotWidget";
 import { useNotifications } from "../context/NotificationContext";
 
 
@@ -9,6 +9,21 @@ export default function Home() {
   const [completedTodos, setCompletedTodos] = useState([]);
   const [username, setUsername] = useState("");
   const {addNotification} = useNotifications();
+
+  //hier wird eingestellt, wann die Pflanze Wasser braucht
+const needsWater = useCallback((pflanze) => {
+  if (!pflanze.letztesGiessen) return true;
+
+  const interval = getGiessIntervall(pflanze.wasser);
+
+  const last = new Date(pflanze.letztesGiessen);
+  const now = new Date();
+
+  const diffDays =
+    (now - last) / (1000 * 60 * 60 * 24);
+
+  return diffDays >= interval;
+}, []);
 
 
 
@@ -75,7 +90,7 @@ useEffect(() => {
   );
 
   localStorage.setItem("todoNotificationDate", today);
-}, [pflanzen, completedTodos]);
+}, [pflanzen, completedTodos, addNotification, needsWater]);
 
 
 
@@ -97,20 +112,7 @@ useEffect(() => {
   }
 
 
-  //hier wird eingestellt, wann die Pflanze Wasser braucht
-  function needsWater(pflanze) {
-    if (!pflanze.letztesGiessen) return true;
 
-    const interval = getGiessIntervall(pflanze.wasser);
-
-    const last = new Date(pflanze.letztesGiessen);
-    const now = new Date();
-
-    const diffDays =
-      (now - last) / (1000 * 60 * 60 * 24);
-
-    return diffDays >= interval;
-  }
 
   //hier werden die To-Dos erstelt, sind zwei Listen, einmal to-do und einmal gießstatus
 const todos = pflanzen.map((pflanze) => ({
